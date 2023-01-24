@@ -1,34 +1,42 @@
 {
-	"expo": {
-		"name": "lifegoal",
-		"slug": "lifegoal",
-		"version": "1.0.0",
-		"plugins": ["@react-native-google-signin/google-signin"],
-		"orientation": "portrait",
-		"icon": "./assets/icon.png",
-		"userInterfaceStyle": "light",
-		"splash": {
-			"image": "./assets/splash.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
-		},
-		"updates": {
-			"fallbackToCacheTimeout": 0
-		},
-		"assetBundlePatterns": ["**/*"],
-		"ios": {
-			// "googleServicesFile": "./GoogleService-Info.plist",
-			"supportsTablet": true
-		},
-		"android": {
-			// "googleServicesFile": "./google-services.json",
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/adaptive-icon.png",
-				"backgroundColor": "#FFFFFF"
-			}
-		},
-		"web": {
-			"favicon": "./assets/favicon.png"
-		}
-	}
+  "expo": {
+    "name": "lifegoal",
+    "slug": "lifegoal",
+    "version": "1.0.0",
+    "plugins": [
+      "@react-native-google-signin/google-signin"
+    ],
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.ggg3.lifegoal"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b40614f7-cc1b-488a-984f-6476314f14c1"
+      }
+    }
+  }
 }
