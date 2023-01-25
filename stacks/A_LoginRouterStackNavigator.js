@@ -1,13 +1,11 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useState } from "react";
-import { useAuth } from "./hooks/useAuth";
-import HomeScreen from "./screens/HomeScreen";
-import LoginScreen from "./screens/LoginScreen";
+import { useAuth } from "../hooks/useAuth";
+import LoginScreen from "../screens/LoginScreen";
+import B_MainTabNavigator from "./B_MainTabNavigator";
 
 const Stack = createNativeStackNavigator();
 
-const StackNavigator = () => {
-	// const [user, setUser] = useState(true);
+const A_LoginRouterStackNavigator = () => {
 	const { user } = useAuth();
 
 	return (
@@ -17,7 +15,7 @@ const StackNavigator = () => {
 			}}
 		>
 			{user ? (
-				<Stack.Screen name="Home" component={HomeScreen} />
+				<Stack.Screen name="Tab Navigator" component={B_MainTabNavigator} />
 			) : (
 				<Stack.Screen name="Login" component={LoginScreen} />
 			)}
@@ -25,4 +23,4 @@ const StackNavigator = () => {
 	);
 };
 
-export default StackNavigator;
+export default A_LoginRouterStackNavigator;
