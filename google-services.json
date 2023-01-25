@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "498741046562",
+    "project_id": "lifegoal-375615",
+    "storage_bucket": "lifegoal-375615.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:498741046562:android:65e29d6e37471786b0097b",
+        "android_client_info": {
+          "package_name": "com.ggg3.lifegoal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "498741046562-jqqvou67e1f7bdq8umekgp6oe789n5dh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ggg3.lifegoal",
+            "certificate_hash": "c98aa7643612ef232e2e6e36746e86c952687afb"
+          }
+        },
+        {
+          "client_id": "498741046562-c8ou54s0h35hler3ti2qc6mgk2ju1jcd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1MtSCf63rKLgswA3hPHv4V_gkaecKHSQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "498741046562-c8ou54s0h35hler3ti2qc6mgk2ju1jcd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
