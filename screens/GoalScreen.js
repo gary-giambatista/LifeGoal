@@ -103,18 +103,26 @@ const GoalScreen = () => {
 					<Image style={styles.profilePic} source={{ uri: user.photoURL }} />
 				</TouchableOpacity>
 			</View>
-			<Text style={styles.callToAction}>
-				Plant this Goal in your mind,{"\n"} and water it with attention
-			</Text>
+			<View style={[styles.CtaContainer, styles.cardShadow]}>
+				<Text style={styles.callToAction}>
+					Plant this Goal in your mind,{"\n"} and water it with attention
+				</Text>
+			</View>
 
 			<KeyboardAvoidingView style={{ flex: 1 }}>
 				{goal.length === 0 || editing ? (
-					<Text style={styles.placeholderText}>
-						Describe your goal, your dream, the ideal world you are striving to
-						create and live in. It is something that you can always strive for,
-						no matter where you are in your life...
-					</Text>
-				) : null}
+					<View style={[styles.placeholderContainer, styles.cardShadow]}>
+						<Text style={styles.placeholderText}>
+							Describe your goal, your dream, the ideal world you are striving
+							to create and live in. It is something that you can always strive
+							for, no matter where you are in your life...
+						</Text>
+					</View>
+				) : (
+					<View style={[styles.goalContainer, styles.cardShadow]}>
+						<Text style={styles.goalText}>{goal}</Text>
+					</View>
+				)}
 				{editing ? (
 					<TextInput
 						ref={inputRef}
@@ -126,11 +134,17 @@ const GoalScreen = () => {
 						value={goal}
 						editable={editing}
 					/>
-				) : (
-					<Text style={styles.goalText}>{goal}</Text>
-				)}
+				) : null}
 				<View style={styles.switchContainer}>
-					<Text style={styles.switchText}>Share your goal anonymously</Text>
+					<TouchableOpacity
+						style={[styles.editButton, editing ? styles.editingNow : null]}
+						onPress={editing ? saveGoal : editGoal}
+					>
+						<Text style={styles.editButtonText}>
+							{editing ? "Save Goal" : "Edit Goal"}{" "}
+						</Text>
+					</TouchableOpacity>
+					<Text style={styles.switchText}>Share your goal anonymously... </Text>
 					{isPublic ? (
 						<Switch
 							style={styles.switchSwitch}
@@ -145,10 +159,7 @@ const GoalScreen = () => {
 						/>
 					)}
 				</View>
-				<Button
-					onPress={editing ? saveGoal : editGoal}
-					title={editing ? "Save Goal" : "Edit Goal"}
-				></Button>
+
 				<Button
 					onPress={() => navigation.navigate("Quote Modal")}
 					title=" Feeling down? View a Quote"
@@ -176,7 +187,7 @@ const styles = StyleSheet.create({
 		alignItems: "baseline",
 		backgroundColor: "white",
 		marginBottom: 3,
-		paddingBottom: 3,
+		paddingBottom: 5,
 		// borderBottomWidth: 1,
 		// borderBottomColor: "#8899A6",
 	},
@@ -216,20 +227,55 @@ const styles = StyleSheet.create({
 
 		elevation: 2,
 	},
+	CtaContainer: {
+		// borderBottomWidth: 7,
+		// borderLeftWidth: 10,
+		borderTopWidth: 7,
+		borderColor: "#658AC2",
+		borderRadius: 10,
+		margin: 5,
+		marginLeft: 10,
+		marginRight: 10,
+		backgroundColor: "white",
+	},
 	callToAction: {
 		fontSize: 18,
 		textAlign: "center",
 		padding: 8,
 	},
+	placeholderContainer: {
+		borderBottomWidth: 7,
+		// borderLeftWidth: 10,
+		borderBottomColor: "#658AC2",
+		borderTopWidth: 7,
+		borderTopColor: "#B4C4DB",
+		borderRadius: 10,
+		margin: 5,
+		marginLeft: 10,
+		marginRight: 10,
+		backgroundColor: "white",
+	},
 	placeholderText: {
 		fontSize: 18,
-		textAlign: "center",
-		padding: 8,
+		// textAlign: "center",
+		padding: 25,
+	},
+	goalContainer: {
+		borderBottomWidth: 7,
+		// borderLeftWidth: 10,
+		borderBottomColor: "#658AC2",
+		borderTopWidth: 7,
+		borderTopColor: "#B4C4DB",
+		borderRadius: 10,
+		margin: 5,
+		marginLeft: 10,
+		marginRight: 10,
+		backgroundColor: "white",
 	},
 	goalText: {
 		fontSize: 18,
-		textAlign: "center",
-		padding: 8,
+		// textAlign: "center",
+		padding: 25,
 	},
 	input: {
 		textAlignVertical: "top",
@@ -245,5 +291,33 @@ const styles = StyleSheet.create({
 		borderRadius: 6,
 		marginRight: 10,
 		marginLeft: 10,
+	},
+	switchContainer: {
+		display: "flex",
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		paddingTop: 8,
+		paddingBottom: 8,
+		marginRight: 5,
+		marginLeft: 15,
+	},
+	editButton: {
+		display: "flex",
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+		backgroundColor: "black",
+		height: 35,
+		width: 100,
+		backgroundColor: "#222F42",
+		borderRadius: 6,
+		// marginRight: 10,
+	},
+	editingNow: {
+		backgroundColor: "#C29C51",
+	},
+	editButtonText: {
+		color: "white",
 	},
 });
