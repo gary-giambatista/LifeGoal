@@ -1,3 +1,4 @@
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
 	default as React,
@@ -31,6 +32,7 @@ const GoalScreen = () => {
 	const [editing, setEditing] = useState(false);
 	const inputRef = useRef();
 	const [isPublic, setIsPublic] = useState(false);
+	const [quote, setQuote] = useState(false);
 
 	function editGoal() {
 		setEditing(true);
@@ -75,7 +77,7 @@ const GoalScreen = () => {
 		setIsPublic((prevPublicState) => !prevPublicState);
 		//db function to update public status
 	}
-	console.log(isPublic);
+	// console.log(isPublic);
 	return (
 		<ScrollView style={{ flex: 1 }}>
 			<View
@@ -103,19 +105,19 @@ const GoalScreen = () => {
 					<Image style={styles.profilePic} source={{ uri: user.photoURL }} />
 				</TouchableOpacity>
 			</View>
-			<View style={[styles.CtaContainer, styles.cardShadow]}>
+			{/* <View style={[styles.CtaContainer, styles.cardShadow]}>
 				<Text style={styles.callToAction}>
 					Plant this Goal in your mind,{"\n"} and water it with attention
 				</Text>
-			</View>
+			</View> */}
 
 			<KeyboardAvoidingView style={{ flex: 1 }}>
 				{goal.length === 0 || editing ? (
 					<View style={[styles.placeholderContainer, styles.cardShadow]}>
 						<Text style={styles.placeholderText}>
-							Describe your goal, your dream, the ideal world you are striving
-							to create and live in. It is something that you can always strive
-							for, no matter where you are in your life...
+							Describe your goal here, your dream, the ideal world you are
+							striving to create and live in. It is something that you can
+							always strive for, no matter where you are in your life...
 						</Text>
 					</View>
 				) : (
@@ -159,11 +161,46 @@ const GoalScreen = () => {
 						/>
 					)}
 				</View>
-
-				<Button
+				{/* START Quote section */}
+				{quote ? (
+					<View style={[styles.quoteContainer, styles.cardShadow]}>
+						<Text style={styles.quoteText}> Quote Goes here</Text>
+					</View>
+				) : null}
+				<View style={[styles.quoteButtonContainer, styles.cardShadow]}>
+					{quote ? (
+						<TouchableOpacity
+							onPress={() => navigation.navigate("Quote Modal")}
+							style={[
+								styles.quoteButton,
+								styles.cardShadow,
+								quote ? styles.quoteButtonSplit : null,
+							]}
+						>
+							<Text style={styles.quoteButtonText}>Save Quote</Text>
+							<Ionicons name="md-bookmarks" size={22} color="#222F42" />
+						</TouchableOpacity>
+					) : null}
+					<TouchableOpacity
+						// onPress={() => navigation.navigate("Quote Modal")}
+						// put DB function to call Zen quotes here
+						onPress={() => setQuote((prevQuote) => !prevQuote)}
+						style={[
+							styles.quoteButton,
+							styles.cardShadow,
+							quote ? styles.quoteButtonSplit : null,
+						]}
+					>
+						<Text style={styles.quoteButtonText}>
+							{quote ? "View another" : "Feeling unmotivated? Touch here"}
+						</Text>
+						<MaterialIcons name="touch-app" size={24} color="#222F42" />
+					</TouchableOpacity>
+				</View>
+				{/* <Button
 					onPress={() => navigation.navigate("Quote Modal")}
 					title=" Feeling down? View a Quote"
-				></Button>
+				></Button> */}
 			</KeyboardAvoidingView>
 		</ScrollView>
 	);
@@ -186,7 +223,7 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		alignItems: "baseline",
 		backgroundColor: "white",
-		marginBottom: 3,
+		marginBottom: 10,
 		paddingBottom: 5,
 		// borderBottomWidth: 1,
 		// borderBottomColor: "#8899A6",
@@ -319,5 +356,54 @@ const styles = StyleSheet.create({
 	},
 	editButtonText: {
 		color: "white",
+	},
+	quoteButtonContainer: {
+		marginTop: 20, //adjust space between goal section
+		display: "flex",
+		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center",
+		marginRight: 10,
+		marginLeft: 10,
+	},
+	quoteButton: {
+		display: "flex",
+		flexDirection: "row",
+		justifyContent: "center",
+		width: "100%",
+		alignItems: "center",
+		height: 48,
+		backgroundColor: "white",
+		borderRadius: 10,
+		borderBottomColor: "#658AC2",
+		borderBottomWidth: 7,
+	},
+	quoteButtonSplit: {
+		width: "48%",
+		marginTop: 0,
+		marginLeft: 5,
+		marginRight: 5,
+	},
+	quoteButtonText: {
+		fontSize: 17,
+		padding: 8,
+	},
+	quoteContainer: {
+		// borderBottomWidth: 7,
+		// borderLeftWidth: 10,
+		// borderBottomColor: "#658AC2",
+		// borderTopWidth: 7,
+		// borderTopColor: "#B4C4DB",
+		marginTop: 20, //adjust space between goal section
+		borderRadius: 10,
+		margin: 5,
+		marginLeft: 10,
+		marginRight: 10,
+		backgroundColor: "white",
+	},
+	quoteText: {
+		fontSize: 18,
+		// textAlign: "center",
+		padding: 25,
 	},
 });

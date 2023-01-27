@@ -16,7 +16,7 @@ const B_MainTabNavigator = () => {
 	const { logOut, loading, user, theme } = useAuth();
 	return (
 		<Tab.Navigator
-			initialRouteName="ExtraHomeScreen"
+			initialRouteName="Goal Screen Tab Container"
 			screenOptions={{
 				tabBarActiveTintColor: "#e91e63",
 				headerShown: false,
