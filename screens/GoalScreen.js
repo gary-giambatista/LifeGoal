@@ -1,4 +1,5 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import firestore from "@react-native-firebase/firestore";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
 	default as React,
@@ -44,8 +45,22 @@ const GoalScreen = () => {
 	function setFocus() {
 		inputRef.current.focus();
 	}
-	function saveGoal() {
+	async function saveGoal() {
 		//db call to update goal
+		//pass in goal, and isPublic?
+		firestore()
+			.collection("Goals")
+			.doc(`${user.uid}`)
+			.set({
+				createdAt: firestore.FieldValue.serverTimestamp(),
+				// lastEdited: firestore.FieldValue.serverTimestamp(),
+				isPublic: isPublic,
+				goal: goal,
+				// timer: 4, 6, 8,
+			})
+			.then(() => {
+				console.log("Goal Updated!");
+			});
 		setEditing(false);
 	}
 
@@ -73,11 +88,38 @@ const GoalScreen = () => {
 			]
 		);
 
-	function setGoalPublicOrPrivate() {
+	async function setGoalPublicOrPrivate() {
 		setIsPublic((prevPublicState) => !prevPublicState);
-		//db function to update public status
+		//db function to update public status>>useEffect cause of state bug
 	}
-	// console.log(isPublic);
+	useEffect(() => {
+		firestore()
+			.collection("Goals")
+			.doc(`${user.uid}`)
+			.update({
+				isPublic: isPublic,
+			})
+			.then(() => {
+				console.log(`isPublic Updated!: ${isPublic}`);
+			});
+	}, [isPublic]);
+	//fetch user data from DB on page mount
+	useEffect(() => {
+		async function fetchUserData() {
+			const data = await firestore()
+				.collection("Goals")
+				.doc(`${user.uid}`)
+				.get();
+			console.log("user data: ", data.data().goal);
+			if (data.data().goal) {
+				setGoal(data.data().goal);
+				setIsPublic(data.data().isPublic);
+			}
+		}
+		fetchUserData();
+	}, []);
+
+	console.log("Global isPublic: ", isPublic);
 	return (
 		<ScrollView style={{ flex: 1 }}>
 			<View
@@ -149,12 +191,14 @@ const GoalScreen = () => {
 					<Text style={styles.switchText}>Share your goal anonymously... </Text>
 					{isPublic ? (
 						<Switch
+							disabled={editing}
 							style={styles.switchSwitch}
 							value={isPublic}
 							onValueChange={togglePublicOffAlert}
 						/>
 					) : (
 						<Switch
+							disabled={editing}
 							style={styles.switchSwitch}
 							value={isPublic}
 							onValueChange={togglePublicOnAlert}
@@ -244,7 +288,7 @@ const styles = StyleSheet.create({
 		borderBottomColor: "#8899A6",
 	},
 	pageTitle: {
-		fontFamily: "quicksand-semi",
+		fontFamily: "FuzzyBubblesBold",
 		fontSize: 30,
 	},
 	darkModeTitle: {
@@ -296,6 +340,8 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		// textAlign: "center",
 		padding: 25,
+		// fontSize: 24,
+		// fontFamily: "IndieFlower",
 	},
 	goalContainer: {
 		borderBottomWidth: 7,
@@ -313,6 +359,8 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		// textAlign: "center",
 		padding: 25,
+		// fontFamily: "IndieFlower",
+		// fontSize: 24,
 	},
 	input: {
 		textAlignVertical: "top",
@@ -380,7 +428,7 @@ const styles = StyleSheet.create({
 	},
 	quoteButtonSplit: {
 		width: "48%",
-		marginTop: 0,
+		// marginTop: 0,
 		marginLeft: 5,
 		marginRight: 5,
 	},
