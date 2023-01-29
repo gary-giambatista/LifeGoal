@@ -26,28 +26,28 @@ import {
 import { useAuth } from "../hooks/useAuth";
 
 const GoalScreen = () => {
+	//hooks
 	const navigation = useNavigation();
 	const { logOut, loading, user, theme } = useAuth();
-
+	//state
 	const [goal, setGoal] = useState("");
 	const [editing, setEditing] = useState(false);
 	const inputRef = useRef();
 	const [isPublic, setIsPublic] = useState(false);
-	const [quote, setQuote] = useState(false);
+	const [quote, setQuote] = useState("");
+	const [quoteAuthor, setQuoteAuthor] = useState("");
 
 	function editGoal() {
 		setEditing(true);
 		setTimeout(setFocus, 50);
-		// inputRef.current.focus();
-		// setEditing(true);
 	}
 	//helper function bc setTimeout required
 	function setFocus() {
 		inputRef.current.focus();
 	}
+	//Update or add a goal function
 	async function saveGoal() {
 		//db call to update goal
-		//pass in goal, and isPublic?
 		firestore()
 			.collection("Goals")
 			.doc(`${user.uid}`)
@@ -87,23 +87,20 @@ const GoalScreen = () => {
 				{ text: "HIDE", onPress: () => setGoalPublicOrPrivate() },
 			]
 		);
-
+	//function to change isPublic state in DB / local state. NEED to update db !state first then change state locally, bc state syncing issue
 	async function setGoalPublicOrPrivate() {
-		setIsPublic((prevPublicState) => !prevPublicState);
-		//db function to update public status>>useEffect cause of state bug
-	}
-	useEffect(() => {
 		firestore()
 			.collection("Goals")
 			.doc(`${user.uid}`)
 			.update({
-				isPublic: isPublic,
+				isPublic: !isPublic,
 			})
 			.then(() => {
-				console.log(`isPublic Updated!: ${isPublic}`);
+				console.log(`isPublic Updated!: ${!isPublic}`);
 			});
-	}, [isPublic]);
-	//fetch user data from DB on page mount
+
+		setIsPublic((prevPublicState) => !prevPublicState);
+	}
 	useEffect(() => {
 		async function fetchUserData() {
 			const data = await firestore()
@@ -119,9 +116,25 @@ const GoalScreen = () => {
 		fetchUserData();
 	}, []);
 
+	async function fetchQuote() {
+		try {
+			const response = await fetch("https://zenquotes.io/api/random");
+			// console.log("Response: ", response);
+
+			const data = await response.json();
+			console.log("Data: ", data[0].a);
+			setQuote(data[0].q);
+			setQuoteAuthor(data[0].a);
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
 	console.log("Global isPublic: ", isPublic);
+	console.log("Quote: ", quote);
 	return (
 		<ScrollView style={{ flex: 1 }}>
+			{/* My Goal - Header Section */}
 			<View
 				style={[
 					styles.HeaderContainer,
@@ -152,8 +165,9 @@ const GoalScreen = () => {
 					Plant this Goal in your mind,{"\n"} and water it with attention
 				</Text>
 			</View> */}
-
+			{/* Goal Card Section */}
 			<KeyboardAvoidingView style={{ flex: 1 }}>
+				{/* PlaceHolder Goal or user's Goal if they have one and not editing */}
 				{goal.length === 0 || editing ? (
 					<View style={[styles.placeholderContainer, styles.cardShadow]}>
 						<Text style={styles.placeholderText}>
@@ -167,6 +181,7 @@ const GoalScreen = () => {
 						<Text style={styles.goalText}>{goal}</Text>
 					</View>
 				)}
+				{/* Show inputbox to update goal while editing is true */}
 				{editing ? (
 					<TextInput
 						ref={inputRef}
@@ -189,6 +204,7 @@ const GoalScreen = () => {
 						</Text>
 					</TouchableOpacity>
 					<Text style={styles.switchText}>Share your goal anonymously... </Text>
+					{/* changes Which switch is shown. isPublic state issue required 2 Switches instead of a conditional for onValueChange/Value */}
 					{isPublic ? (
 						<Switch
 							disabled={editing}
@@ -205,10 +221,11 @@ const GoalScreen = () => {
 						/>
 					)}
 				</View>
-				{/* START Quote section */}
+				{/* Quote section */}
 				{quote ? (
 					<View style={[styles.quoteContainer, styles.cardShadow]}>
-						<Text style={styles.quoteText}> Quote Goes here</Text>
+						<Text style={styles.quoteText}> "{quote}" </Text>
+						<Text style={styles.quoteAuthor}> - {quoteAuthor} </Text>
 					</View>
 				) : null}
 				<View style={[styles.quoteButtonContainer, styles.cardShadow]}>
@@ -228,7 +245,8 @@ const GoalScreen = () => {
 					<TouchableOpacity
 						// onPress={() => navigation.navigate("Quote Modal")}
 						// put DB function to call Zen quotes here
-						onPress={() => setQuote((prevQuote) => !prevQuote)}
+						// onPress={() => setQuote((prevQuote) => !prevQuote)}
+						onPress={fetchQuote}
 						style={[
 							styles.quoteButton,
 							styles.cardShadow,
@@ -451,7 +469,17 @@ const styles = StyleSheet.create({
 	},
 	quoteText: {
 		fontSize: 18,
+		fontStyle: "italic",
 		// textAlign: "center",
-		padding: 25,
+		paddingTop: 25,
+		paddingRight: 25,
+		paddingLeft: 25,
+		paddingBottom: 0,
+	},
+	quoteAuthor: {
+		fontSize: 14,
+		fontStyle: "italic",
+		textAlign: "right",
+		padding: 10,
 	},
 });
