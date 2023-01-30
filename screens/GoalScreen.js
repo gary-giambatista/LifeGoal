@@ -9,6 +9,7 @@ import {
 	useState,
 } from "react";
 import {
+	ActivityIndicator,
 	Alert,
 	Button,
 	Image,
@@ -28,7 +29,7 @@ import { useAuth } from "../hooks/useAuth";
 const GoalScreen = () => {
 	//hooks
 	const navigation = useNavigation();
-	const { logOut, loading, user, theme } = useAuth();
+	const { logOut, user, theme } = useAuth();
 	//state
 	const [goal, setGoal] = useState("");
 	const [editing, setEditing] = useState(false);
@@ -36,6 +37,7 @@ const GoalScreen = () => {
 	const [isPublic, setIsPublic] = useState(false);
 	const [quote, setQuote] = useState("");
 	const [quoteAuthor, setQuoteAuthor] = useState("");
+	const [isFetching, setIsFetching] = useState(false);
 
 	function editGoal() {
 		setEditing(true);
@@ -107,7 +109,7 @@ const GoalScreen = () => {
 				.collection("Goals")
 				.doc(`${user.uid}`)
 				.get();
-			console.log("user data: ", data.data().goal);
+			// console.log("user data: ", data.data().goal);
 			if (data.data().goal) {
 				setGoal(data.data().goal);
 				setIsPublic(data.data().isPublic);
@@ -117,21 +119,39 @@ const GoalScreen = () => {
 	}, []);
 
 	async function fetchQuote() {
+		setIsFetching(true);
 		try {
 			const response = await fetch("https://zenquotes.io/api/random");
 			// console.log("Response: ", response);
 
 			const data = await response.json();
-			console.log("Data: ", data[0].a);
+			// console.log("Data: ", data[0].a);
 			setQuote(data[0].q);
 			setQuoteAuthor(data[0].a);
 		} catch (error) {
 			console.log(error);
 		}
+		setIsFetching(false);
 	}
 
-	console.log("Global isPublic: ", isPublic);
-	console.log("Quote: ", quote);
+	async function saveQuote() {
+		firestore()
+			.collection("Quotes")
+			// .doc(`${user.uid}`)
+			.add({
+				userId: user.uid,
+				createdAt: firestore.FieldValue.serverTimestamp(),
+				quote: quote,
+				quoteAuthor: quoteAuthor,
+			})
+			.then(() => {
+				console.log("Quote Saved!");
+			});
+	}
+
+	// console.log("Global isPublic: ", isPublic);
+	// console.log("Quote: ", quote);
+
 	return (
 		<ScrollView style={{ flex: 1 }}>
 			{/* My Goal - Header Section */}
@@ -222,6 +242,7 @@ const GoalScreen = () => {
 					)}
 				</View>
 				{/* Quote section */}
+				{isFetching ? <ActivityIndicator /> : null}
 				{quote ? (
 					<View style={[styles.quoteContainer, styles.cardShadow]}>
 						<Text style={styles.quoteText}> "{quote}" </Text>
@@ -231,7 +252,8 @@ const GoalScreen = () => {
 				<View style={[styles.quoteButtonContainer, styles.cardShadow]}>
 					{quote ? (
 						<TouchableOpacity
-							onPress={() => navigation.navigate("Quote Modal")}
+							// onPress={() => navigation.navigate("Quote Modal")}
+							onPress={saveQuote}
 							style={[
 								styles.quoteButton,
 								styles.cardShadow,

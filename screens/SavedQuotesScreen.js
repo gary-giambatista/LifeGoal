@@ -1,10 +1,12 @@
 import React from "react";
 import { Text, View } from "react-native";
+import SavedQuoteList from "../components/SavedQuoteList";
 
 const SavedQuotesScreen = () => {
 	return (
 		<View>
-			<Text>SavedQuotesScreen</Text>
+			{/* Quote List > Quote Row Components */}
+			<SavedQuoteList />
 		</View>
 	);
 };
