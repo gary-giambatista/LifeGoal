@@ -45,6 +45,8 @@ const styles = StyleSheet.create({
 		// flexDirection: "col",
 		backgroundColor: "white",
 		borderRadius: 10,
+		borderLeftWidth: 7,
+		borderColor: "#658AC2",
 	},
 	darkModeRowContainer: {
 		backgroundColor: "#0E1A28",

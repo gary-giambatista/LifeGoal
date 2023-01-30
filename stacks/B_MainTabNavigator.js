@@ -46,7 +46,7 @@ const B_MainTabNavigator = () => {
 				name="Goal Feed"
 				component={GoalFeed}
 				options={{
-					tabBarLabel: "Goals",
+					tabBarLabel: "Goal Feed",
 					tabBarIcon: ({ color, size }) => (
 						<MaterialCommunityIcons
 							name="format-list-text"

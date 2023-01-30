@@ -1,41 +1,62 @@
 import firestore from "@react-native-firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+	Button,
+	FlatList,
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
 import { useAuth } from "../hooks/useAuth";
-import SavedQuoteRow from "./SavedQuoteRow";
+import GoalFeedRow from "./GoalFeedRow";
 
-const SavedQuoteList = () => {
-	//fetch user's Saved quotes
+const GoalFeedList = () => {
 	const { user, theme } = useAuth();
-	const [quotes, setQuotes] = useState([]);
+	const [goals, setGoals] = useState([]);
 
+	//fetching goals KEYS
+	//Sort by: != user.uid && isPublic == true
+	//orderBy: createdAt descending
+	//handle Flatlist lazy loading >> call the function to fetch more?
+
+	async function getGoals() {
+		try {
+			const snapshot = await firestore()
+				.collection("Goals")
+				.where("isPublic", "==", true)
+				.where("userId", "!=", user.uid)
+				.get();
+			const goals = snapshot.docs.map((doc) => doc.data());
+			return setGoals(goals);
+		} catch (error) {
+			console.error(error);
+		}
+	}
 	useEffect(() => {
-		firestore()
-			.collection("Quotes")
-			.where("userId", "==", user.uid)
-			// .orderBy("createdAt", "desc")
-			.onSnapshot((snapshot) => {
-				setQuotes(
-					snapshot.docs.map((doc) => ({
-						id: doc.id,
-						...doc.data(),
-					}))
-				);
-			});
-	}, [user]);
-	// **Setting the Quote order to be descending in order by createdAt date
-	//nanoseconds/seconds
-	//quotes[i].createdAt
-	// console.log(quotes[1].createdAt);
-	// const newQuotes = quotes.sort((a, b) => {
-	// 	b.createdAt - a.createdAt;
-	// });
+		getGoals();
+	}, []);
 
-	// console.log(quotes);
-
-	return quotes.length > 0 ? (
+	//Fetch Goals live event listener
+	// useEffect(() => {
+	// 	firestore()
+	// 		.collection("Goals")
+	// 		.where("isPublic", "==", true)
+	// 		.where("userId", "==", user.uid)
+	// 		// .orderBy("createdAt", "desc")
+	// 		.onSnapshot((snapshot) => {
+	// 			setGoals(
+	// 				snapshot.docs.map((doc) => ({
+	// 					id: doc.id,
+	// 					...doc.data(),
+	// 				}))
+	// 			);
+	// 		});
+	// }, [user]);
+	console.log(goals);
+	return (
 		<View>
-			{/* Header for "Saved Quotes" screen */}
+			{/* Header for "Goal Feed" screen */}
 			<View
 				style={[
 					styles.HeaderContainer,
@@ -49,7 +70,7 @@ const SavedQuoteList = () => {
 						theme === "dark" ? styles.darkModeTitle : null,
 					]}
 				>
-					Saved Quotes
+					Goal Feed
 				</Text>
 			</View>
 			{/* Map out the Quote's using a <SavedQuoteRow component */}
@@ -58,19 +79,17 @@ const SavedQuoteList = () => {
 					styles.chatListContainer,
 					theme === "dark" ? styles.darkModeChatListContainer : null,
 				]}
-				data={quotes}
-				keyExtractor={(item) => item.id}
-				renderItem={({ item }) => <SavedQuoteRow quote={item} />}
+				data={goals}
+				keyExtractor={(item) => item.userId}
+				renderItem={({ item }) => <GoalFeedRow goal={item} />}
 			/>
-		</View>
-	) : (
-		<View>
-			<Text style={styles.noMatchText}>No saved quotes yet</Text>
 		</View>
 	);
 };
 
-export default SavedQuoteList;
+export default GoalFeedList;
+
+//Concerns > lazy loading and handling limits for quotes. Also scroll view, will it work from the Flatlist
 
 const styles = StyleSheet.create({
 	chatListContainer: {
@@ -95,16 +114,13 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "baseline",
 		backgroundColor: "white",
-		marginBottom: 10,
+		marginBottom: 5,
 		paddingBottom: 5,
 		// borderBottomWidth: 1,
 		// borderBottomColor: "#8899A6",
 	},
 	darkModeBG: {
 		backgroundColor: "#0E1A28",
-	},
-	darkModeTitle: {
-		color: "#8899A6",
 	},
 	pageTitle: {
 		fontFamily: "FuzzyBubblesBold",
@@ -120,11 +136,5 @@ const styles = StyleSheet.create({
 		shadowRadius: 1.41,
 
 		elevation: 2,
-	},
-	darkModeQuoteText: {
-		color: "#8899A6",
-	},
-	darkModeText: {
-		color: "#4C5F75",
 	},
 });

@@ -54,6 +54,7 @@ const GoalScreen = () => {
 			.collection("Goals")
 			.doc(`${user.uid}`)
 			.set({
+				userId: user.uid,
 				createdAt: firestore.FieldValue.serverTimestamp(),
 				// lastEdited: firestore.FieldValue.serverTimestamp(),
 				isPublic: isPublic,
