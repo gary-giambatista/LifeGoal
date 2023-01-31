@@ -1,11 +1,14 @@
+import { SimpleLineIcons } from "@expo/vector-icons";
 import firestore from "@react-native-firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
+	ActivityIndicator,
 	Button,
 	FlatList,
 	ScrollView,
 	StyleSheet,
 	Text,
+	TouchableOpacity,
 	View,
 } from "react-native";
 import { useAuth } from "../hooks/useAuth";
@@ -14,7 +17,7 @@ import GoalFeedRow from "./GoalFeedRow";
 const GoalFeedList = () => {
 	const { user, theme } = useAuth();
 	const [goals, setGoals] = useState([]);
-
+	const [isLoading, setIsLoading] = useState(false);
 	//fetching goals KEYS
 	//Sort by: != user.uid && isPublic == true
 	//orderBy: createdAt descending
@@ -22,16 +25,19 @@ const GoalFeedList = () => {
 
 	async function getGoals() {
 		try {
+			setIsLoading(true);
 			const snapshot = await firestore()
 				.collection("Goals")
 				.where("isPublic", "==", true)
 				.where("userId", "!=", user.uid)
 				.get();
 			const goals = snapshot.docs.map((doc) => doc.data());
+			setIsLoading(false);
 			return setGoals(goals);
 		} catch (error) {
 			console.error(error);
 		}
+		setIsLoading(false);
 	}
 	useEffect(() => {
 		getGoals();
@@ -64,6 +70,8 @@ const GoalFeedList = () => {
 					theme === "dark" ? styles.darkModeBG : null,
 				]}
 			>
+				{/* Empty view for flex-space between 33% | 33% | 33% */}
+				<View></View>
 				<Text
 					style={[
 						styles.pageTitle,
@@ -72,7 +80,14 @@ const GoalFeedList = () => {
 				>
 					Goal Feed
 				</Text>
+				<TouchableOpacity
+					onPress={getGoals}
+					style={styles.refreshIconContainer}
+				>
+					<SimpleLineIcons name="refresh" size={24} color="#222F42" />
+				</TouchableOpacity>
 			</View>
+			{isLoading ? <ActivityIndicator /> : null}
 			{/* Map out the Quote's using a <SavedQuoteRow component */}
 			<FlatList
 				style={[
@@ -93,7 +108,8 @@ export default GoalFeedList;
 
 const styles = StyleSheet.create({
 	chatListContainer: {
-		height: "100%",
+		height: "89%",
+		overflow: "scroll",
 	},
 	darkModeChatListContainer: {
 		backgroundColor: "#2B3642",
@@ -111,7 +127,7 @@ const styles = StyleSheet.create({
 		paddingRight: 15,
 		display: "flex",
 		flexDirection: "row",
-		justifyContent: "center",
+		justifyContent: "space-between",
 		alignItems: "baseline",
 		backgroundColor: "white",
 		marginBottom: 5,
@@ -125,6 +141,10 @@ const styles = StyleSheet.create({
 	pageTitle: {
 		fontFamily: "FuzzyBubblesBold",
 		fontSize: 30,
+		color: "#222F42",
+	},
+	refreshIconContainer: {
+		// marginLeft: "auto",
 	},
 	cardShadow: {
 		shadowColor: "000",

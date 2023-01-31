@@ -331,6 +331,7 @@ const styles = StyleSheet.create({
 	pageTitle: {
 		fontFamily: "FuzzyBubblesBold",
 		fontSize: 30,
+		color: "#222F42",
 	},
 	darkModeTitle: {
 		// color: "#8899A6",

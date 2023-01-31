@@ -1,6 +1,13 @@
 import firestore from "@react-native-firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+	ActivityIndicator,
+	FlatList,
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
 import { useAuth } from "../hooks/useAuth";
 import SavedQuoteRow from "./SavedQuoteRow";
 
@@ -8,8 +15,10 @@ const SavedQuoteList = () => {
 	//fetch user's Saved quotes
 	const { user, theme } = useAuth();
 	const [quotes, setQuotes] = useState([]);
+	// const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
+		// setIsLoading(true);
 		firestore()
 			.collection("Quotes")
 			.where("userId", "==", user.uid)
@@ -22,6 +31,7 @@ const SavedQuoteList = () => {
 					}))
 				);
 			});
+		// setIsLoading(false);
 	}, [user]);
 	// **Setting the Quote order to be descending in order by createdAt date
 	//nanoseconds/seconds
@@ -35,6 +45,7 @@ const SavedQuoteList = () => {
 
 	return quotes.length > 0 ? (
 		<View>
+			{/* {isLoading ? <ActivityIndicator /> : null} */}
 			{/* Header for "Saved Quotes" screen */}
 			<View
 				style={[
@@ -74,7 +85,8 @@ export default SavedQuoteList;
 
 const styles = StyleSheet.create({
 	chatListContainer: {
-		height: "100%",
+		height: "89%",
+		overflow: "scroll",
 	},
 	darkModeChatListContainer: {
 		backgroundColor: "#2B3642",
@@ -109,6 +121,7 @@ const styles = StyleSheet.create({
 	pageTitle: {
 		fontFamily: "FuzzyBubblesBold",
 		fontSize: 30,
+		color: "#222F42",
 	},
 	cardShadow: {
 		shadowColor: "000",

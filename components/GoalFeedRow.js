@@ -30,6 +30,7 @@ export default GoalFeedRow;
 const styles = StyleSheet.create({
 	rowContainer: {
 		margin: 10,
+		marginBottom: 5,
 		padding: 20,
 		backgroundColor: "white",
 		borderRadius: 10,
