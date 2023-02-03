@@ -1,6 +1,7 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import firestore from "@react-native-firebase/firestore";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import * as Notifications from "expo-notifications";
 import {
 	default as React,
 	useContext,
@@ -25,6 +26,15 @@ import {
 	View,
 } from "react-native";
 import { useAuth } from "../hooks/useAuth";
+
+// Initialize Notifications Handler
+// Notifications.setNotificationHandler({
+// 	handleNotification: async () => ({
+// 		shouldShowAlert: true,
+// 		shouldPlaySound: false,
+// 		shouldSetBadge: false,
+// 	}),
+// });
 
 const GoalScreen = () => {
 	//hooks
@@ -149,6 +159,34 @@ const GoalScreen = () => {
 				console.log("Quote Saved!");
 			});
 	}
+	//Jonathan's consultation
+	//write in user created quotes
+	//Make user created quotes shareable
+	//add a screen for viewing user created quotes
+	async function clearNotifications() {
+		const notis = await Notifications.getAllScheduledNotificationsAsync();
+		console.log(notis);
+		Notifications.dismissAllNotificationsAsync();
+	}
+
+	// useEffect(() => {
+	// 	async function setNotifications() {
+	// 		//notification message and time
+	// 		await Notifications.scheduleNotificationAsync({
+	// 			content: {
+	// 				title: "Look at that notification",
+	// 				body: "I'm so proud of myself!",
+	// 			},
+	// 			trigger: {
+	// 				seconds: 60000,
+	// 				// repeats: true,
+	// 			},
+	// 		});
+	// 	}
+	// 	return () => {
+	// 		setNotifications();
+	// 	};
+	// }, []);
 
 	// console.log("Global isPublic: ", isPublic);
 	// console.log("Quote: ", quote);
@@ -287,6 +325,7 @@ const GoalScreen = () => {
 					title=" Feeling down? View a Quote"
 				></Button> */}
 			</KeyboardAvoidingView>
+			<Button title="clear Notifications" onPress={clearNotifications}></Button>
 		</ScrollView>
 	);
 };

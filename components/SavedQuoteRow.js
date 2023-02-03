@@ -5,6 +5,7 @@ import { useAuth } from "../hooks/useAuth";
 const SavedQuoteRow = ({ quote }) => {
 	const { user, theme } = useAuth();
 
+	//add function to delete quote in savedQuoteList and pass down here
 	return (
 		<TouchableOpacity
 			// onPress={() => navigation.navigate("Message", { matchDetails })}

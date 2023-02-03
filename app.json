@@ -4,8 +4,9 @@
 		"slug": "lifegoal",
 		"version": "1.0.0",
 		"plugins": [
-			"@react-native-google-signin/google-signin",
-			"@react-native-firebase/app"
+			"@react-native-google-signin/google-signin", // google social auth
+			"@react-native-firebase/app", //connect react native fb
+			"expo-notifications" // enable notifications
 		],
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
@@ -21,14 +22,15 @@
 		"assetBundlePatterns": ["**/*"],
 		"ios": {
 			"supportsTablet": true
+			//need to insert bundle for IOS auth
 		},
 		"android": {
-			"googleServicesFile": "./google-services.json",
+			"googleServicesFile": "./google-services.json", //for google auth
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/adaptive-icon.png",
 				"backgroundColor": "#FFFFFF"
 			},
-			"package": "com.ggg3.lifegoal"
+			"package": "com.ggg3.lifegoal" // for android auth
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
