@@ -57,7 +57,7 @@ const SavedQuoteList = () => {
 
 	console.log(editing);
 	return (
-		<View>
+		<ScrollView>
 			{/* {isLoading ? <ActivityIndicator /> : null} */}
 			{/* Header for "Saved Quotes" screen */}
 			<View
@@ -76,7 +76,13 @@ const SavedQuoteList = () => {
 				>
 					Saved Quotes
 				</Text>
-				{!editing ? (
+				<AntDesign
+					onPress={() => setEditing(true)}
+					name="plus"
+					size={24}
+					color="#222F42"
+				/>
+				{/* {!editing ? (
 					<AntDesign
 						onPress={() => setEditing((prevEditing) => !prevEditing)}
 						name="plus"
@@ -90,7 +96,7 @@ const SavedQuoteList = () => {
 						size={24}
 						color="#222F42"
 					/>
-				)}
+				)} */}
 			</View>
 			{/* USER CREATED QUOTES section */}
 			<UserCreatedQuoteList editing={editing} setEditing={setEditing} />
@@ -109,7 +115,7 @@ const SavedQuoteList = () => {
 			) : (
 				<Text style={styles.noMatchText}>You have no saved quotes yet.</Text>
 			)}
-		</View>
+		</ScrollView>
 	);
 };
 
@@ -118,8 +124,7 @@ export default SavedQuoteList;
 const styles = StyleSheet.create({
 	chatListContainer: {
 		// height: "89%",
-		height: "100%",
-		overflow: "scroll",
+		// overflow: "scroll",
 	},
 	darkModeChatListContainer: {
 		backgroundColor: "#2B3642",

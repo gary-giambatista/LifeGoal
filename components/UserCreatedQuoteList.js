@@ -1,20 +1,58 @@
-import React, { useState } from "react";
+import firestore from "@react-native-firebase/firestore";
+import React, { useEffect, useState } from "react";
 import {
+	FlatList,
+	SectionList,
 	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { useAuth } from "../hooks/useAuth";
 import UserCreatedQuoteRow from "./UserCreatedQuoteRow";
 
 const UserCreatedQuoteList = ({ editing, setEditing }) => {
 	const [userQuotes, setUserQuotes] = useState([]);
 	const [userQuote, setUserQuote] = useState("");
+	const { user, theme } = useAuth();
 
-	//TODO: Create 3 db functions
-	//fetch(liveListener > save in userQuotes[]), add, and delete DB functions
-	//pass delete down to row
+	// FETCH: live listener for "UserQuotes" collection
+	useEffect(() => {
+		firestore()
+			.collection("UserQuotes")
+			.where("userId", "==", user.uid)
+			// .orderBy("createdAt", "desc")
+			.onSnapshot((snapshot) => {
+				setUserQuotes(
+					snapshot.docs.map((doc) => ({
+						id: doc.id,
+						...doc.data(),
+					}))
+				);
+			});
+	}, [user]);
+	// console.log(userQuotes);
+	//TODO: Sort user quotes by creation date
+
+	//use userQuote from TextInput to write to DB and create UserQuotes collection
+	// WRITE: onPress of "Save" button > create UserQuote using userQuote state
+	async function createUserQuote() {
+		firestore()
+			.collection("UserQuotes")
+			// .doc(`${user.uid}`)
+			.add({
+				userId: user.uid,
+				createdAt: firestore.FieldValue.serverTimestamp(),
+				userQuote: userQuote,
+				//FUTURE isPublic: false,
+			})
+			.then(() => {
+				setEditing(false);
+				console.log("Quote Saved!");
+			});
+	}
+	//notes on create: cannot pass userQuote up to SavedQuoteList for fancy header icon swap (cannot properly update DB)
 
 	return (
 		<View style={styles.componentContainer}>
@@ -30,18 +68,38 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 						value={userQuote}
 						editable={editing}
 					/>
-					<TouchableOpacity
-						onPress={() => setEditing((prevEditing) => !prevEditing)}
-						style={styles.editButtonContainer}
-					>
-						<Text style={styles.editButtonText}>Save</Text>
-					</TouchableOpacity>
+					<View style={{ display: "flex", flexDirection: "row" }}>
+						<TouchableOpacity
+							onPress={() => {
+								createUserQuote();
+							}}
+							disabled={!editing}
+							style={styles.saveButton}
+						>
+							<Text style={styles.buttonText}>Save</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							onPress={() => {
+								setUserQuote("");
+								setEditing(false);
+							}}
+							style={styles.cancelButton}
+						>
+							<Text style={styles.buttonText}>Cancel</Text>
+						</TouchableOpacity>
+					</View>
 				</View>
 			) : null}
-			{userQuote && !editing ? (
+			{userQuotes || (userQuote && !editing) ? (
 				<View>
 					{/* <Text style={styles.sectionTitle}>Your quotes</Text> */}
-					<UserCreatedQuoteRow userQuote={userQuote} />
+					{/* try sectionlist here */}
+					{/* <UserCreatedQuoteRow userQuote={userQuote} /> */}
+					<FlatList
+						data={userQuotes}
+						keyExtractor={(item) => item.id}
+						renderItem={({ item }) => <UserCreatedQuoteRow userQuote={item} />}
+					/>
 				</View>
 			) : null}
 		</View>
@@ -72,7 +130,7 @@ const styles = StyleSheet.create({
 
 		elevation: 2,
 	},
-	editButtonContainer: {
+	saveButton: {
 		display: "flex",
 		flexDirection: "row",
 		alignItems: "center",
@@ -83,8 +141,22 @@ const styles = StyleSheet.create({
 		width: 80,
 		backgroundColor: "#222F42",
 		borderRadius: 6,
+		marginRight: 8,
 	},
-	editButtonText: {
+	cancelButton: {
+		display: "flex",
+		flexDirection: "row",
+		alignItems: "center",
+		paddingBottom: 2,
+		justifyContent: "center",
+		backgroundColor: "black",
+		height: 30,
+		width: 80,
+		backgroundColor: "#993626",
+		borderRadius: 6,
+		marginRight: 8,
+	},
+	buttonText: {
 		fontSize: 16,
 		color: "white",
 	},
@@ -93,7 +165,8 @@ const styles = StyleSheet.create({
 		marginRight: 10,
 		fontSize: 20,
 	},
-	quoteText: {
-		fontSize: 14,
-	},
+	// quoteText: {
+	// 	fontSize: 14,
+
+	// },
 });

@@ -1,14 +1,45 @@
+import firestore from "@react-native-firebase/firestore";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useAuth } from "../hooks/useAuth";
 
 const SavedQuoteRow = ({ quote }) => {
 	const { user, theme } = useAuth();
 
-	//add function to delete quote in savedQuoteList and pass down here
+	//Also can move function 1 component up to <SavedQuoteList /> and pass down here
+	// Firebase delete function, with document id as quoteID from props < event listener is <SavedQuoteList /> useEffect
+	async function deleteQuote(quoteId) {
+		firestore()
+			.collection("Quotes")
+			.doc(`${quoteId}`)
+			.delete()
+			.then(() => {
+				console.log("Quote deleted!");
+			});
+	}
+
+	//onPress function to alert, if yes, calls deleteQuote
+	const touchToDeleteAlert = () =>
+		Alert.alert(
+			"DELETE Quote?",
+			"If you press DELETE, this quote will be removed for your saved list!",
+			[
+				{
+					text: "Cancel",
+					onPress: () => console.log("Cancel Pressed"),
+					style: "cancel",
+				},
+				{ text: "DELETE", onPress: () => deleteQuote(quote.id) },
+			]
+		);
+
 	return (
 		<TouchableOpacity
 			// onPress={() => navigation.navigate("Message", { matchDetails })}
+			//test quote below
+			onPress={() => {
+				touchToDeleteAlert();
+			}}
 			style={[
 				styles.rowContainer,
 				styles.cardShadow,

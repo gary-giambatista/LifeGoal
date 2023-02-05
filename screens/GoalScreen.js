@@ -325,7 +325,7 @@ const GoalScreen = () => {
 					title=" Feeling down? View a Quote"
 				></Button> */}
 			</KeyboardAvoidingView>
-			<Button title="clear Notifications" onPress={clearNotifications}></Button>
+			{/* <Button title="clear Notifications" onPress={clearNotifications}></Button> */}
 		</ScrollView>
 	);
 };
@@ -437,9 +437,10 @@ const styles = StyleSheet.create({
 		backgroundColor: "white",
 	},
 	goalText: {
-		fontSize: 18,
-		// textAlign: "center",
+		fontSize: 20, //was 18
+		fontFamily: "FuzzyBubblesRegular",
 		padding: 25,
+		// textAlign: "center",
 		// fontFamily: "IndieFlower",
 		// fontSize: 24,
 	},
