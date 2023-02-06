@@ -18,6 +18,7 @@ const SavedQuoteList = () => {
 	//fetch user's Saved quotes
 	const { user, theme } = useAuth();
 	const [quotes, setQuotes] = useState([]);
+	const [sortedQuotes, setSortedQuotes] = useState([]);
 	const [editing, setEditing] = useState(false);
 
 	// FETCH: db listener for SAVED QUOTES
@@ -41,8 +42,25 @@ const SavedQuoteList = () => {
 	//nanoseconds/seconds
 	//quotes[i].createdAt
 	// console.log(quotes[0].createdAt);
+	useEffect(() => {
+		setSortedQuotes(
+			quotes.sort((a, b) => {
+				try {
+					// console.log(b.createdAt.seconds);
+					return b.createdAt.seconds - a.createdAt.seconds;
+				} catch (error) {
+					// console.log(error);
+					// console.log("createdAt A", a.createdAt);
+					// console.log("createdAt B", b.createdAt);
+					return 0;
+				}
+			})
+		);
+	}, [quotes]);
+
+	// console.log(sortedQuotes);
 	// const newQuotes = quotes.sort((a, b) => {
-	// 	console.log(b.createdAt.seconds);
+	// 	// console.log(b.createdAt.seconds);
 	// 	b.createdAt.seconds - a.createdAt.seconds;
 	// });
 	// console.log(newQuotes);
@@ -55,9 +73,9 @@ const SavedQuoteList = () => {
 	// fetch user's quotes
 	// create a user quote
 
-	console.log(editing);
+	// console.log(quotes);
 	return (
-		<ScrollView>
+		<View>
 			{/* {isLoading ? <ActivityIndicator /> : null} */}
 			{/* Header for "Saved Quotes" screen */}
 			<View
@@ -108,14 +126,14 @@ const SavedQuoteList = () => {
 						styles.chatListContainer,
 						theme === "dark" ? styles.darkModeChatListContainer : null,
 					]}
-					data={quotes}
+					data={sortedQuotes}
 					keyExtractor={(item) => item.id}
 					renderItem={({ item }) => <SavedQuoteRow quote={item} />}
 				/>
 			) : (
 				<Text style={styles.noMatchText}>You have no saved quotes yet.</Text>
 			)}
-		</ScrollView>
+		</View>
 	);
 };
 
