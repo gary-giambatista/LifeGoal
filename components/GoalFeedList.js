@@ -29,9 +29,11 @@ const GoalFeedList = () => {
 			const snapshot = await firestore()
 				.collection("Goals")
 				.where("isPublic", "==", true)
-				.where("userId", "!=", user.uid)
+				// .where("userId", "!=", user.uid)
+				.orderBy("createdAt", "desc")
 				.get();
 			const goals = snapshot.docs.map((doc) => doc.data());
+			//insert SORT function here to remove user's own quote
 			setIsLoading(false);
 			return setGoals(goals);
 		} catch (error) {

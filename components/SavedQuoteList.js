@@ -18,7 +18,7 @@ const SavedQuoteList = () => {
 	//fetch user's Saved quotes
 	const { user, theme } = useAuth();
 	const [quotes, setQuotes] = useState([]);
-	const [sortedQuotes, setSortedQuotes] = useState([]);
+	// const [sortedQuotes, setSortedQuotes] = useState([]);
 	const [editing, setEditing] = useState(false);
 
 	// FETCH: db listener for SAVED QUOTES
@@ -26,7 +26,7 @@ const SavedQuoteList = () => {
 		firestore()
 			.collection("Quotes")
 			.where("userId", "==", user.uid)
-			// .orderBy("createdAt", "desc")
+			.orderBy("createdAt", "desc") // test
 			.onSnapshot((snapshot) => {
 				setQuotes(
 					snapshot.docs.map((doc) => ({
@@ -42,21 +42,22 @@ const SavedQuoteList = () => {
 	//nanoseconds/seconds
 	//quotes[i].createdAt
 	// console.log(quotes[0].createdAt);
-	useEffect(() => {
-		setSortedQuotes(
-			quotes.sort((a, b) => {
-				try {
-					// console.log(b.createdAt.seconds);
-					return b.createdAt.seconds - a.createdAt.seconds;
-				} catch (error) {
-					// console.log(error);
-					// console.log("createdAt A", a.createdAt);
-					// console.log("createdAt B", b.createdAt);
-					return 0;
-				}
-			})
-		);
-	}, [quotes]);
+	// SORT METHOD<><>PROBABLY DON'T NEED<><>**
+	// useEffect(() => {
+	// 	setSortedQuotes(
+	// 		quotes.sort((a, b) => {
+	// 			try {
+	// 				// console.log(b.createdAt.seconds);
+	// 				return b.createdAt.seconds - a.createdAt.seconds;
+	// 			} catch (error) {
+	// 				// console.log(error);
+	// 				// console.log("createdAt A", a.createdAt);
+	// 				// console.log("createdAt B", b.createdAt);
+	// 				return 0;
+	// 			}
+	// 		})
+	// 	);
+	// }, [quotes]);
 
 	// console.log(sortedQuotes);
 	// const newQuotes = quotes.sort((a, b) => {
@@ -85,6 +86,7 @@ const SavedQuoteList = () => {
 					theme === "dark" ? styles.darkModeBG : null,
 				]}
 			>
+				{/* Empty view for flex-space between 33% | 33% | 33% */}
 				<View></View>
 				<Text
 					style={[
@@ -126,7 +128,7 @@ const SavedQuoteList = () => {
 						styles.chatListContainer,
 						theme === "dark" ? styles.darkModeChatListContainer : null,
 					]}
-					data={sortedQuotes}
+					data={quotes}
 					keyExtractor={(item) => item.id}
 					renderItem={({ item }) => <SavedQuoteRow quote={item} />}
 				/>

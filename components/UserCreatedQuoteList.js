@@ -22,7 +22,7 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 		firestore()
 			.collection("UserQuotes")
 			.where("userId", "==", user.uid)
-			// .orderBy("createdAt", "desc")
+			.orderBy("createdAt", "desc")
 			.onSnapshot((snapshot) => {
 				setUserQuotes(
 					snapshot.docs.map((doc) => ({
@@ -32,11 +32,9 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 				);
 			});
 	}, [user]);
-	// console.log(userQuotes);
-	//TODO: Sort user quotes by creation date
 
 	//use userQuote from TextInput to write to DB and create UserQuotes collection
-	// WRITE: onPress of "Save" button > create UserQuote using userQuote state
+	// WRITE FUNCTION: onPress of "Save" button > create UserQuote using userQuote state
 	async function createUserQuote() {
 		firestore()
 			.collection("UserQuotes")
