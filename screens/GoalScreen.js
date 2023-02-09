@@ -28,13 +28,13 @@ import {
 import { useAuth } from "../hooks/useAuth";
 
 // Initialize Notifications Handler
-// Notifications.setNotificationHandler({
-// 	handleNotification: async () => ({
-// 		shouldShowAlert: true,
-// 		shouldPlaySound: false,
-// 		shouldSetBadge: false,
-// 	}),
-// });
+Notifications.setNotificationHandler({
+	handleNotification: async () => ({
+		shouldShowAlert: true,
+		shouldPlaySound: false,
+		shouldSetBadge: false,
+	}),
+});
 
 const GoalScreen = () => {
 	//hooks
@@ -164,28 +164,31 @@ const GoalScreen = () => {
 	//Make user created quotes shareable
 	//add a screen for viewing user created quotes
 	async function clearNotifications() {
-		const notis = await Notifications.getAllScheduledNotificationsAsync();
-		console.log(notis);
-		Notifications.dismissAllNotificationsAsync();
+		const notificationId =
+			await Notifications.getAllScheduledNotificationsAsync();
+		console.log(notificationId);
+		// Notifications.dismissAllNotificationsAsync();
+	}
+
+	//notification message and time
+	async function setNotifications() {
+		const notifications = await Notifications.scheduleNotificationAsync({
+			content: {
+				title: "Remember to check your goal",
+				body: "Don't forget what you are working towards!",
+			},
+			trigger: {
+				seconds: 15,
+				// repeats: true,
+			},
+		});
+		console.log(`notification ${notifications} set for 15 seconds`);
+		//can save notifications in state if need access to the notification ID
 	}
 
 	// useEffect(() => {
-	// 	async function setNotifications() {
-	// 		//notification message and time
-	// 		await Notifications.scheduleNotificationAsync({
-	// 			content: {
-	// 				title: "Look at that notification",
-	// 				body: "I'm so proud of myself!",
-	// 			},
-	// 			trigger: {
-	// 				seconds: 60000,
-	// 				// repeats: true,
-	// 			},
-	// 		});
-	// 	}
-	// 	return () => {
-	// 		setNotifications();
-	// 	};
+	// 	console.log("use Effect called");
+	// 	return setNotifications;
 	// }, []);
 
 	// console.log("Global isPublic: ", isPublic);
@@ -219,6 +222,9 @@ const GoalScreen = () => {
 					<Image style={styles.profilePic} source={{ uri: user.photoURL }} />
 				</TouchableOpacity>
 			</View>
+			<TouchableOpacity>
+				<Text>Learn how to Write a good goal</Text>
+			</TouchableOpacity>
 			{/* <View style={[styles.CtaContainer, styles.cardShadow]}>
 				<Text style={styles.callToAction}>
 					Plant this Goal in your mind,{"\n"} and water it with attention
@@ -325,7 +331,11 @@ const GoalScreen = () => {
 					title=" Feeling down? View a Quote"
 				></Button> */}
 			</KeyboardAvoidingView>
-			{/* <Button title="clear Notifications" onPress={clearNotifications}></Button> */}
+			<Button title="clear Notifications" onPress={clearNotifications}></Button>
+			<Button
+				title="Schedule Notifications"
+				onPress={setNotifications}
+			></Button>
 		</ScrollView>
 	);
 };
@@ -437,9 +447,10 @@ const styles = StyleSheet.create({
 		backgroundColor: "white",
 	},
 	goalText: {
-		fontSize: 20, //was 18
-		fontFamily: "FuzzyBubblesRegular",
+		fontSize: 18, //was 20
+		lineHeight: 25,
 		padding: 25,
+		// fontFamily: "FuzzyBubblesRegular",
 		// textAlign: "center",
 		// fontFamily: "IndieFlower",
 		// fontSize: 24,

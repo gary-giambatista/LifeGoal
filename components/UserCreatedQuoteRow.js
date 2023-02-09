@@ -75,8 +75,8 @@ const styles = StyleSheet.create({
 	},
 	quoteText: {
 		fontSize: 18,
-		// fontStyle: "italic",
+		fontStyle: "italic",
 		padding: 13,
-		fontFamily: "FuzzyBubblesRegular",
+		// fontFamily: "FuzzyBubblesRegular",
 	},
 });
