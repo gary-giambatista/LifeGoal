@@ -18,7 +18,11 @@ const GoalFeedList = () => {
 	const { user, theme } = useAuth();
 	const [goals, setGoals] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
-	//fetching goals KEYS
+	// const [lastVisibleGoal, setLastVisibleGoal] = useState(null);
+	const [currentGoals, setCurrentGoals] = useState(0);
+	const [isLastGoal, setIsLastGoal] = useState(false);
+
+	//fetching goals IMPORTANT CONSTRAINTS
 	//Sort by: != user.uid && isPublic == true
 	//orderBy: createdAt descending
 	//handle Flatlist lazy loading >> call the function to fetch more?
@@ -31,7 +35,13 @@ const GoalFeedList = () => {
 				.where("isPublic", "==", true)
 				// .where("userId", "!=", user.uid)
 				.orderBy("createdAt", "desc")
+				.limit(10)
 				.get();
+			setCurrentGoals(10);
+			if (isLastGoal === true) {
+				setIsLastGoal(false);
+			}
+			// setLastVisibleGoal(snapshot.docs[snapshot.docs.length - 1]);
 			const goals = snapshot.docs.map((doc) => doc.data());
 			//insert SORT function here to remove user's own quote
 			setIsLoading(false);
@@ -45,6 +55,44 @@ const GoalFeedList = () => {
 		getGoals();
 	}, []);
 
+	async function getMoreGoals2() {
+		console.log("getting More");
+		setCurrentGoals((prevGoals) => prevGoals + 10);
+	}
+
+	async function getMoreGoals(lastVisibleGoal) {
+		try {
+			setIsLoading(true);
+			const snapshot = await firestore()
+				.collection("Goals")
+				.where("isPublic", "==", true)
+				// .where("userId", "!=", user.uid)
+				.orderBy("createdAt", "desc")
+				.startAfter(currentGoals)
+				.limit(10)
+				.get();
+			// setLastVisibleGoal(snapshot.docs[snapshot.docs.length - 1]);
+			if (!isLastGoal) {
+				setCurrentGoals((prevGoals) => prevGoals + 10);
+				const tempGoals = snapshot.docs.map((doc) => doc.data());
+				//insert SORT function here to remove user's own quote
+				setIsLoading(false);
+				tempGoals.length === 0 ? setIsLastGoal(true) : null;
+				return setGoals([...goals, ...tempGoals]);
+			}
+		} catch (error) {
+			console.error(error);
+		}
+		return setIsLoading(false);
+	}
+
+	//TODO: Possible problems:
+	// 1. NEED to use setLastVisibleGoal .property or remove .data()
+	// 2. Spread Operator [..., ...] into array
+	// 3. Check parameter lastVisibleGoal is being updated correctly
+
+	console.log("current goals", currentGoals);
+	console.log("is last goal", isLastGoal);
 	//Fetch Goals live event listener
 	// useEffect(() => {
 	// 	firestore()
@@ -61,7 +109,7 @@ const GoalFeedList = () => {
 	// 			);
 	// 		});
 	// }, [user]);
-	console.log(goals);
+	// console.log(goals);
 	return (
 		<View>
 			{/* Header for "Goal Feed" screen */}
@@ -99,6 +147,10 @@ const GoalFeedList = () => {
 				data={goals}
 				keyExtractor={(item) => item.userId}
 				renderItem={({ item }) => <GoalFeedRow goal={item} />}
+				onEndReached={getMoreGoals}
+				onEndReachedThreshold={0.01}
+				scrollEventThrottle={150}
+				ListFooterComponent={() => (isLastGoal ? null : <ActivityIndicator />)}
 			/>
 		</View>
 	);
