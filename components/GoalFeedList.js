@@ -17,8 +17,6 @@ import GoalFeedRow from "./GoalFeedRow";
 const GoalFeedList = () => {
 	const { user, theme } = useAuth();
 	const [goals, setGoals] = useState([]);
-	const [isLoading, setIsLoading] = useState(false);
-	// const [lastVisibleGoal, setLastVisibleGoal] = useState(null);
 	const [currentGoals, setCurrentGoals] = useState(0);
 	const [isLastGoal, setIsLastGoal] = useState(false);
 
@@ -29,11 +27,10 @@ const GoalFeedList = () => {
 
 	async function getGoals() {
 		try {
-			setIsLoading(true);
 			const snapshot = await firestore()
 				.collection("Goals")
 				.where("isPublic", "==", true)
-				// .where("userId", "!=", user.uid)
+				// .where("userId", "!=", user.uid)**
 				.orderBy("createdAt", "desc")
 				.limit(10)
 				.get();
@@ -41,10 +38,8 @@ const GoalFeedList = () => {
 			if (isLastGoal === true) {
 				setIsLastGoal(false);
 			}
-			// setLastVisibleGoal(snapshot.docs[snapshot.docs.length - 1]);
 			const goals = snapshot.docs.map((doc) => doc.data());
-			//insert SORT function here to remove user's own quote
-			setIsLoading(false);
+			//insert SORT function here to remove user's own quote**
 			return setGoals(goals);
 		} catch (error) {
 			console.error(error);
@@ -55,35 +50,28 @@ const GoalFeedList = () => {
 		getGoals();
 	}, []);
 
-	async function getMoreGoals2() {
-		console.log("getting More");
-		setCurrentGoals((prevGoals) => prevGoals + 10);
-	}
-
-	async function getMoreGoals(lastVisibleGoal) {
+	async function getMoreGoals() {
+		// console.log("More goals triggered");
 		try {
-			setIsLoading(true);
+			//fetch 10 more goals
 			const snapshot = await firestore()
 				.collection("Goals")
 				.where("isPublic", "==", true)
-				// .where("userId", "!=", user.uid)
+				// .where("userId", "!=", user.uid)**
 				.orderBy("createdAt", "desc")
 				.startAfter(currentGoals)
 				.limit(10)
 				.get();
-			// setLastVisibleGoal(snapshot.docs[snapshot.docs.length - 1]);
 			if (!isLastGoal) {
-				setCurrentGoals((prevGoals) => prevGoals + 10);
+				setCurrentGoals((prevGoals) => prevGoals + 10); // increment goals by 10
 				const tempGoals = snapshot.docs.map((doc) => doc.data());
-				//insert SORT function here to remove user's own quote
-				setIsLoading(false);
-				tempGoals.length === 0 ? setIsLastGoal(true) : null;
-				return setGoals([...goals, ...tempGoals]);
+				//insert SORT function here to remove user's own quote**
+				tempGoals.length === 0 ? setIsLastGoal(true) : null; // if query is empty, setIsLastGoal = true
+				return setGoals([...goals, ...tempGoals]); //combine the new query with existing quer in state
 			}
 		} catch (error) {
 			console.error(error);
 		}
-		return setIsLoading(false);
 	}
 
 	//TODO: Possible problems:
@@ -91,8 +79,9 @@ const GoalFeedList = () => {
 	// 2. Spread Operator [..., ...] into array
 	// 3. Check parameter lastVisibleGoal is being updated correctly
 
-	console.log("current goals", currentGoals);
-	console.log("is last goal", isLastGoal);
+	// console.log("current goals", currentGoals);
+	// console.log("is last goal", isLastGoal);
+
 	//Fetch Goals live event listener
 	// useEffect(() => {
 	// 	firestore()
@@ -137,7 +126,7 @@ const GoalFeedList = () => {
 					<SimpleLineIcons name="refresh" size={24} color="#222F42" />
 				</TouchableOpacity>
 			</View>
-			{isLoading ? <ActivityIndicator /> : null}
+
 			{/* Map out the Quote's using a <SavedQuoteRow component */}
 			<FlatList
 				style={[
@@ -149,16 +138,22 @@ const GoalFeedList = () => {
 				renderItem={({ item }) => <GoalFeedRow goal={item} />}
 				onEndReached={getMoreGoals}
 				onEndReachedThreshold={0.01}
-				scrollEventThrottle={150}
-				ListFooterComponent={() => (isLastGoal ? null : <ActivityIndicator />)}
+				scrollEventThrottle={500}
+				ListFooterComponent={() =>
+					isLastGoal ? (
+						<Text style={styles.noMoreGoalsText}>
+							Sorry! There are no more goals.{" "}
+						</Text>
+					) : (
+						<ActivityIndicator />
+					)
+				}
 			/>
 		</View>
 	);
 };
 
 export default GoalFeedList;
-
-//Concerns > lazy loading and handling limits for quotes. Also scroll view, will it work from the Flatlist
 
 const styles = StyleSheet.create({
 	chatListContainer: {
@@ -210,5 +205,10 @@ const styles = StyleSheet.create({
 		shadowRadius: 1.41,
 
 		elevation: 2,
+	},
+	noMoreGoalsText: {
+		fontSize: 15,
+		textAlign: "center",
+		padding: 8,
 	},
 });
