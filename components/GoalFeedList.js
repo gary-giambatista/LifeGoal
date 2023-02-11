@@ -17,8 +17,9 @@ import GoalFeedRow from "./GoalFeedRow";
 const GoalFeedList = () => {
 	const { user, theme } = useAuth();
 	const [goals, setGoals] = useState([]);
-	const [currentGoals, setCurrentGoals] = useState(0);
+	const [lastGoalFetched, setLastGoalFetched] = useState(null);
 	const [isLastGoal, setIsLastGoal] = useState(false);
+	const [isloading, setIsLoading] = useState(false);
 
 	//fetching goals IMPORTANT CONSTRAINTS
 	//Sort by: != user.uid && isPublic == true
@@ -34,11 +35,12 @@ const GoalFeedList = () => {
 				.orderBy("createdAt", "desc")
 				.limit(10)
 				.get();
-			setCurrentGoals(10);
 			if (isLastGoal === true) {
 				setIsLastGoal(false);
 			}
 			const goals = snapshot.docs.map((doc) => doc.data());
+			setLastGoalFetched(snapshot.docs[snapshot.docs.length - 1]);
+			// console.log(lastGoalFetched);
 			//insert SORT function here to remove user's own quote**
 			return setGoals(goals);
 		} catch (error) {
@@ -46,27 +48,38 @@ const GoalFeedList = () => {
 		}
 		setIsLoading(false);
 	}
+	//getGoals on PAGE LOAD
 	useEffect(() => {
 		getGoals();
 	}, []);
+	//get goals for the refresh button (needed to add loading spinner at top)
+	async function getGoalsButton() {
+		setIsLoading(true);
+		await getGoals();
+		setIsLoading(false);
+	}
 
 	async function getMoreGoals() {
 		// console.log("More goals triggered");
 		try {
-			//fetch 10 more goals
-			const snapshot = await firestore()
-				.collection("Goals")
-				.where("isPublic", "==", true)
-				// .where("userId", "!=", user.uid)**
-				.orderBy("createdAt", "desc")
-				.startAfter(currentGoals)
-				.limit(10)
-				.get();
-			if (!isLastGoal) {
-				setCurrentGoals((prevGoals) => prevGoals + 10); // increment goals by 10
+			if (isLastGoal === false) {
+				//fetch 10 more goals
+				const snapshot = await firestore()
+					.collection("Goals")
+					.where("isPublic", "==", true)
+					// .where("userId", "!=", user.uid)**
+					.orderBy("createdAt", "desc")
+					.startAfter(lastGoalFetched)
+					.limit(1)
+					.get();
 				const tempGoals = snapshot.docs.map((doc) => doc.data());
+				console.log(tempGoals);
+				// not sure if setLastGoalFetched is good in the ternary****
+				tempGoals.length === 0
+					? setIsLastGoal(true)
+					: setLastGoalFetched(snapshot.docs[snapshot.docs.length - 1]); // if query is empty, setIsLastGoal = true otherwise setLastGoalFetched to the last index of the array of fetched goals
+
 				//insert SORT function here to remove user's own quote**
-				tempGoals.length === 0 ? setIsLastGoal(true) : null; // if query is empty, setIsLastGoal = true
 				return setGoals([...goals, ...tempGoals]); //combine the new query with existing quer in state
 			}
 		} catch (error) {
@@ -120,13 +133,13 @@ const GoalFeedList = () => {
 					Goal Feed
 				</Text>
 				<TouchableOpacity
-					onPress={getGoals}
+					onPress={getGoalsButton}
 					style={styles.refreshIconContainer}
 				>
 					<SimpleLineIcons name="refresh" size={24} color="#222F42" />
 				</TouchableOpacity>
 			</View>
-
+			{isloading ? <ActivityIndicator style={{ padding: 8 }} /> : null}
 			{/* Map out the Quote's using a <SavedQuoteRow component */}
 			<FlatList
 				style={[
@@ -145,7 +158,7 @@ const GoalFeedList = () => {
 							Sorry! There are no more goals.{" "}
 						</Text>
 					) : (
-						<ActivityIndicator />
+						<ActivityIndicator style={{ padding: 8 }} />
 					)
 				}
 			/>
