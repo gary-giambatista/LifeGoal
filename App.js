@@ -11,6 +11,11 @@ export default function App() {
 		IndieFlower: require("./assets/fonts/IndieFlower-Regular.ttf"),
 		FuzzyBubblesRegular: require("./assets/fonts/FuzzyBubbles-Regular.ttf"),
 		FuzzyBubblesBold: require("./assets/fonts/FuzzyBubbles-Bold.ttf"),
+		PhiloReg: require("./assets/fonts/Philosopher-Regular.ttf"),
+		PhiloBold: require("./assets/fonts/Philosopher-Bold.ttf"),
+		PhiloItalic: require("./assets/fonts/Philosopher-Italic.ttf"),
+		PhiloBoldItalic: require("./assets/fonts/Philosopher-BoldItalic.ttf"),
+		Marck: require("./assets/fonts/MarckScript-Regular.ttf"),
 	});
 	if (!fontsLoaded) {
 		return null;

@@ -16,7 +16,7 @@ const GoalHelpModal = () => {
 	const { user, theme } = useAuth();
 	const [tips, setTips] = useState(tipData);
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: "#2C2B42" }}>
 			{/* Header for "Goal Feed" screen */}
 			<View
 				style={[
@@ -29,7 +29,11 @@ const GoalHelpModal = () => {
 					onPress={() => navigation.navigate("Goal Screen")}
 					style={styles.refreshIconContainer}
 				>
-					<AntDesign name="back" size={24} color="#222F42" />
+					<AntDesign
+						name="back"
+						size={24}
+						color={theme === "dark" ? "#8A86CF" : "#222F42"}
+					/>
 				</TouchableOpacity>
 				<Text
 					style={[
@@ -47,12 +51,16 @@ const GoalHelpModal = () => {
 					return (
 						<View
 							key={tip.id}
-							style={[styles.tipRowContainer, styles.cardShadow]}
+							style={[
+								styles.tipRowContainer,
+								styles.cardShadow,
+								theme === "dark" ? styles.tipRowContainerDarkMode : null,
+							]}
 						>
 							<MaterialCommunityIcons
 								name="chevron-double-right"
 								size={24}
-								color="#658AC2"
+								color={theme === "dark" ? "#222133" : "#658AC2"}
 								style={styles.chevron}
 							/>
 							<Text style={styles.tips}>{tip.tip}</Text>
@@ -93,9 +101,6 @@ const styles = StyleSheet.create({
 		height: "89%",
 		overflow: "scroll",
 	},
-	darkModeChatListContainer: {
-		backgroundColor: "#2B3642",
-	},
 	noMatchText: {
 		padding: 20,
 		textAlign: "center",
@@ -118,12 +123,17 @@ const styles = StyleSheet.create({
 		// borderBottomColor: "#8899A6",
 	},
 	darkModeBG: {
-		backgroundColor: "#0E1A28",
+		backgroundColor: "#222133",
 	},
 	pageTitle: {
-		fontFamily: "FuzzyBubblesBold",
-		fontSize: 30,
+		fontFamily: "PhiloBold",
+		fontSize: 32,
 		color: "#222F42",
+		letterSpacing: 1,
+		marginRight: 20,
+	},
+	darkModeTitle: {
+		color: "white",
 	},
 	refreshIconContainer: {
 		// marginLeft: "auto",
@@ -143,7 +153,6 @@ const styles = StyleSheet.create({
 		display: "flex",
 		flexDirection: "row",
 		alignItems: "center",
-		// justifyContent: "fle",
 		margin: 5,
 		marginLeft: 10,
 		marginRight: 10,
@@ -152,18 +161,24 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 7,
 		borderBottomColor: "#A7B6CC",
 	},
+	tipRowContainerDarkMode: {
+		backgroundColor: "#5F5D8F",
+
+		borderRadius: 8,
+		borderBottomColor: "#8A86CF",
+	},
 	chevron: {
 		paddingLeft: 15,
 	},
 	tips: {
 		// backgroundColor: "grey",
 		maxWidth: "90%",
-		marginRight: "auto",
-		fontSize: 16,
+		// marginRight: "auto",
+		fontSize: 17,
 		lineHeight: 22,
 		padding: 15,
-		borderBottomColor: "black",
-		borderBottomEndRadius: 5,
+		paddingRight: 20,
+		textAlign: "justify",
 	},
 	cardShadow: {
 		shadowColor: "000",

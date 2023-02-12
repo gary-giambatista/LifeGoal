@@ -187,36 +187,36 @@ const GoalScreen = () => {
 		console.log(`3. notification ${notifications} set for 15 seconds`);
 		//can save notifications in state if need access to the notification ID
 	}
-	// CHECKING NOTIFICATIONS Step 0
-	console.log("0. NOTIFICATION STATE: ", notification);
+	// // CHECKING NOTIFICATIONS Step 0
+	// console.log("0. NOTIFICATION STATE: ", notification);
 
-	//CHECK IF NOTIFICATION EXISTS - only ON initial APP START
-	useEffect(() => {
-		const isScheduledNotification = async () => {
-			try {
-				await Notifications.getAllScheduledNotificationsAsync().then(
-					(result) => {
-						console.log("1. RESULT: ", result, result.length);
-						result.length === 0
-							? setNotification(false)
-							: setNotification(true);
-					}
-				);
-			} catch (error) {
-				console.log(error);
-			}
-		};
-		isScheduledNotification();
-	}, []);
-	//**DO I NEED TO UPDATE setNotification(state) ?*/
+	// //CHECK IF NOTIFICATION EXISTS - only ON initial APP START
+	// useEffect(() => {
+	// 	const isScheduledNotification = async () => {
+	// 		try {
+	// 			await Notifications.getAllScheduledNotificationsAsync().then(
+	// 				(result) => {
+	// 					console.log("1. RESULT: ", result, result.length);
+	// 					result.length === 0
+	// 						? setNotification(false)
+	// 						: setNotification(true);
+	// 				}
+	// 			);
+	// 		} catch (error) {
+	// 			console.log(error);
+	// 		}
+	// 	};
+	// 	isScheduledNotification();
+	// }, []);
+	// //**DO I NEED TO UPDATE setNotification(state) ?*/
 
-	//CREATE or DON'T CREATE Notification
-	useEffect(() => {
-		if (notification === false) {
-			console.log("2. NEW NOTIFICATION TRIGGERED");
-			createNotification();
-		} else console.log("2. NEW NOTIFICATION NOT TRIGGERED");
-	}, [notification]);
+	// //CREATE or DON'T CREATE Notification
+	// useEffect(() => {
+	// 	if (notification === false) {
+	// 		console.log("2. NEW NOTIFICATION TRIGGERED");
+	// 		createNotification();
+	// 	} else console.log("2. NEW NOTIFICATION NOT TRIGGERED");
+	// }, [notification]);
 
 	//**To Update Notification */
 	//0. IF cancel all works, and doesn't cancel other apps notifcations use that
@@ -228,7 +228,9 @@ const GoalScreen = () => {
 	// console.log("Quote: ", quote);
 
 	return (
-		<ScrollView style={{ flex: 1 }}>
+		<ScrollView
+			style={[styles.screenBG, theme === "dark" ? styles.screenBGDark : null]}
+		>
 			{/* My Goal - Header Section */}
 			<View
 				style={[
@@ -286,7 +288,13 @@ const GoalScreen = () => {
 						</Text>
 					</View>
 				) : (
-					<View style={[styles.goalContainer, styles.cardShadow]}>
+					<View
+						style={[
+							styles.goalContainer,
+							styles.cardShadow,
+							theme === "dark" ? styles.goalContainerDarkMode : null,
+						]}
+					>
 						<Text style={styles.goalText}>{goal}</Text>
 					</View>
 				)}
@@ -305,7 +313,11 @@ const GoalScreen = () => {
 				) : null}
 				<View style={styles.switchContainer}>
 					<TouchableOpacity
-						style={[styles.editButton, editing ? styles.editingNow : null]}
+						style={[
+							styles.editButton,
+							editing ? styles.editingNow : null,
+							theme === "dark" ? styles.darkButton : null,
+						]}
 						onPress={editing ? saveGoal : editGoal}
 					>
 						<Text style={styles.editButtonText}>
@@ -333,7 +345,13 @@ const GoalScreen = () => {
 				{/* Quote section */}
 				{isFetching ? <ActivityIndicator /> : null}
 				{quote ? (
-					<View style={[styles.quoteContainer, styles.cardShadow]}>
+					<View
+						style={[
+							styles.quoteContainer,
+							styles.cardShadow,
+							theme === "dark" ? styles.quoteContainerDarkMode : null,
+						]}
+					>
 						<Text style={styles.quoteText}> "{quote}" </Text>
 						<Text style={styles.quoteAuthor}> - {quoteAuthor} </Text>
 					</View>
@@ -347,10 +365,15 @@ const GoalScreen = () => {
 								styles.quoteButton,
 								styles.cardShadow,
 								quote ? styles.quoteButtonSplit : null,
+								theme === "dark" ? styles.quoteButtonDarkMode : null,
 							]}
 						>
 							<Text style={styles.quoteButtonText}>Save Quote</Text>
-							<Ionicons name="md-bookmarks" size={22} color="#222F42" />
+							<Ionicons
+								name="md-bookmarks"
+								size={22}
+								color={theme === "dark" ? "#222133" : "#222F42"}
+							/>
 						</TouchableOpacity>
 					) : null}
 					<TouchableOpacity
@@ -362,12 +385,17 @@ const GoalScreen = () => {
 							styles.quoteButton,
 							styles.cardShadow,
 							quote ? styles.quoteButtonSplit : null,
+							theme === "dark" ? styles.quoteButtonDarkMode : null,
 						]}
 					>
 						<Text style={styles.quoteButtonText}>
 							{quote ? "View another" : "Feeling unmotivated? Touch here"}
 						</Text>
-						<MaterialIcons name="touch-app" size={24} color="#222F42" />
+						<MaterialIcons
+							name="touch-app"
+							size={24}
+							color={theme === "dark" ? "#222133" : "#222F42"}
+						/>
 					</TouchableOpacity>
 				</View>
 				{/* <Button
@@ -375,11 +403,11 @@ const GoalScreen = () => {
 					title=" Feeling down? View a Quote"
 				></Button> */}
 			</KeyboardAvoidingView>
-			<Button title="Check Notifications" onPress={clearNotifications}></Button>
+			{/* <Button title="Check Notifications" onPress={clearNotifications}></Button>
 			<Button
 				title="Schedule Notifications"
 				onPress={createNotification}
-			></Button>
+			></Button> */}
 		</ScrollView>
 	);
 };
@@ -387,6 +415,14 @@ const GoalScreen = () => {
 export default GoalScreen;
 
 const styles = StyleSheet.create({
+	screenBG: {
+		flex: 1,
+	},
+	screenBGDark: {
+		// backgroundColor: "#3C3B4F", L c1
+		// backgroundColor: "#2C2B42", C2
+		backgroundColor: "#2C2B42", //#35334F
+	},
 	profilePic: {
 		height: 40,
 		width: 40,
@@ -407,7 +443,21 @@ const styles = StyleSheet.create({
 		// borderBottomColor: "#8899A6",
 	},
 	darkModeBG: {
-		backgroundColor: "#0E1A28",
+		//base #6D6B8F
+		// backgroundColor: "#2C2B42", D
+		// backgroundColor: "#3C3B4F", L
+		//base
+		// backgroundColor: "#181824", dark
+		// backgroundColor: "#1d1d2b", still pretty dark C1
+		// backgroundColor: "#2A2033", wow - D
+		// backgroundColor: "#2A243B", sleek - L
+		// backgroundColor: "#181824", Nice dark
+		// backgroundColor: "#222233", very balanced nice d/L
+		// backgroundColor: "#2A243B", C2
+		// borderBottomColor: "#3C3B4F",
+		// borderBottomWidth: 1,
+		backgroundColor: "#222133",
+		// backgroundColor: "#5F5D8F",
 	},
 	logo: {
 		height: 40,
@@ -422,15 +472,13 @@ const styles = StyleSheet.create({
 		borderBottomColor: "#8899A6",
 	},
 	pageTitle: {
-		fontFamily: "FuzzyBubblesBold",
-		fontSize: 30,
+		fontFamily: "PhiloBold",
+		fontSize: 32,
 		color: "#222F42",
+		letterSpacing: 1,
 	},
 	darkModeTitle: {
-		// color: "#8899A6",
-		color: "#B0B3B8",
-		// color: "#4C5F75",
-		// color: "#447FC2",
+		color: "white",
 	},
 	cardShadow: {
 		shadowColor: "000",
@@ -455,6 +503,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "white",
 	},
 	callToAction: {
+		fontFamily: "PhiloReg",
 		fontSize: 18,
 		textAlign: "center",
 		padding: 8,
@@ -471,12 +520,17 @@ const styles = StyleSheet.create({
 		marginRight: 10,
 		backgroundColor: "white",
 	},
+	placeholderContainerDarkMode: {
+		borderBottomWidth: 0,
+		borderTopWidth: 0,
+		backgroundColor: "#5F5D8F",
+	},
 	placeholderText: {
-		fontSize: 18,
-		// textAlign: "center",
+		fontFamily: "PhiloReg",
+		fontSize: 22, //was 20
+		lineHeight: 26,
 		padding: 25,
-		// fontSize: 24,
-		// fontFamily: "IndieFlower",
+		textAlign: "justify",
 	},
 	goalContainer: {
 		borderBottomWidth: 7,
@@ -490,10 +544,20 @@ const styles = StyleSheet.create({
 		marginRight: 10,
 		backgroundColor: "white",
 	},
+	goalContainerDarkMode: {
+		backgroundColor: "#5F5D8F",
+		borderRadius: 8,
+		borderTopColor: "#8A86CF",
+		borderBottomColor: "#8A86CF",
+		borderTopWidth: 0,
+		borderBottomWidth: 0,
+	},
 	goalText: {
-		fontSize: 18, //was 20
-		lineHeight: 25,
+		fontFamily: "PhiloReg",
+		fontSize: 22, //was 20
+		lineHeight: 26,
 		padding: 25,
+		textAlign: "justify",
 		// fontFamily: "FuzzyBubblesRegular",
 		// textAlign: "center",
 		// fontFamily: "IndieFlower",
@@ -533,13 +597,20 @@ const styles = StyleSheet.create({
 		height: 35,
 		width: 100,
 		backgroundColor: "#222F42",
+
 		borderRadius: 6,
 		// marginRight: 10,
+	},
+	darkButton: {
+		backgroundColor: "#222133",
 	},
 	editingNow: {
 		backgroundColor: "#C29C51",
 	},
 	editButtonText: {
+		// fontFamily: "PhiloReg",
+		// fontSize: 15,
+		// letterSpacing: 1,
 		color: "white",
 	},
 	quoteButtonContainer: {
@@ -562,6 +633,12 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		borderBottomColor: "#658AC2",
 		borderBottomWidth: 7,
+	},
+	quoteButtonDarkMode: {
+		backgroundColor: "#5F5D8F",
+		borderBottomColor: "#8A86CF",
+		borderBottomWidth: 7,
+		borderRadius: 8,
 	},
 	quoteButtonSplit: {
 		width: "48%",
@@ -586,9 +663,13 @@ const styles = StyleSheet.create({
 		marginRight: 10,
 		backgroundColor: "white",
 	},
+	quoteContainerDarkMode: {
+		backgroundColor: "#5F5D8F",
+	},
 	quoteText: {
 		fontSize: 18,
-		fontStyle: "italic",
+		fontFamily: "PhiloItalic",
+		// fontStyle: "italic",
 		// textAlign: "center",
 		paddingTop: 25,
 		paddingRight: 25,

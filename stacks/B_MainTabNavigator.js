@@ -18,8 +18,10 @@ const B_MainTabNavigator = () => {
 		<Tab.Navigator
 			initialRouteName="Goal Screen Tab Container"
 			screenOptions={{
-				tabBarActiveTintColor: "#e91e63",
+				tabBarActiveTintColor: theme === "dark" ? "#928FDB" : "#658AC2",
 				headerShown: false,
+				tabBarActiveBackgroundColor: "#2C2B42",
+				tabBarInactiveBackgroundColor: "#222133",
 			}}
 		>
 			<Tab.Screen
@@ -28,7 +30,12 @@ const B_MainTabNavigator = () => {
 				options={{
 					tabBarLabel: "Saved Quotes",
 					tabBarIcon: ({ color, size }) => (
-						<Ionicons name="md-bookmarks" size={size} color={color} />
+						<Ionicons
+							name="md-bookmarks"
+							size={size}
+							color={color}
+							//theme === "dark" ? "" : ""
+						/>
 					),
 				}}
 			/>
