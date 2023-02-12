@@ -1,6 +1,7 @@
 import firestore from "@react-native-firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
+	ActivityIndicator,
 	FlatList,
 	SectionList,
 	StyleSheet,
@@ -97,9 +98,16 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 						data={userQuotes}
 						keyExtractor={(item) => item.id}
 						renderItem={({ item }) => <UserCreatedQuoteRow userQuote={item} />}
+						// ListFooterComponent={() => {
+						// 	userQuotes.length === 0 ? null : (
+						// 		<ActivityIndicator style={{ padding: 8 }} />
+						// 	);
+						// }}
 					/>
 				</View>
-			) : null}
+			) : (
+				<ActivityIndicator style={{ padding: 8 }} />
+			)}
 		</View>
 	);
 };

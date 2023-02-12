@@ -26,6 +26,7 @@ import {
 	View,
 } from "react-native";
 import { useAuth } from "../hooks/useAuth";
+import GoalHelpModal from "./GoalHelpModal";
 
 // Initialize Notifications Handler
 Notifications.setNotificationHandler({
@@ -48,6 +49,7 @@ const GoalScreen = () => {
 	const [quote, setQuote] = useState("");
 	const [quoteAuthor, setQuoteAuthor] = useState("");
 	const [isFetching, setIsFetching] = useState(false);
+	const [notification, setNotification] = useState(null);
 
 	function editGoal() {
 		setEditing(true);
@@ -170,8 +172,8 @@ const GoalScreen = () => {
 		// Notifications.dismissAllNotificationsAsync();
 	}
 
-	//notification message and time
-	async function setNotifications() {
+	// CREATE NOTIFICATION FUNCTION
+	async function createNotification() {
 		const notifications = await Notifications.scheduleNotificationAsync({
 			content: {
 				title: "Remember to check your goal",
@@ -182,14 +184,45 @@ const GoalScreen = () => {
 				// repeats: true,
 			},
 		});
-		console.log(`notification ${notifications} set for 15 seconds`);
+		console.log(`3. notification ${notifications} set for 15 seconds`);
 		//can save notifications in state if need access to the notification ID
 	}
+	// CHECKING NOTIFICATIONS Step 0
+	console.log("0. NOTIFICATION STATE: ", notification);
 
-	// useEffect(() => {
-	// 	console.log("use Effect called");
-	// 	return setNotifications;
-	// }, []);
+	//CHECK IF NOTIFICATION EXISTS - only ON initial APP START
+	useEffect(() => {
+		const isScheduledNotification = async () => {
+			try {
+				await Notifications.getAllScheduledNotificationsAsync().then(
+					(result) => {
+						console.log("1. RESULT: ", result, result.length);
+						result.length === 0
+							? setNotification(false)
+							: setNotification(true);
+					}
+				);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+		isScheduledNotification();
+	}, []);
+	//**DO I NEED TO UPDATE setNotification(state) ?*/
+
+	//CREATE or DON'T CREATE Notification
+	useEffect(() => {
+		if (notification === false) {
+			console.log("2. NEW NOTIFICATION TRIGGERED");
+			createNotification();
+		} else console.log("2. NEW NOTIFICATION NOT TRIGGERED");
+	}, [notification]);
+
+	//**To Update Notification */
+	//0. IF cancel all works, and doesn't cancel other apps notifcations use that
+	//1. fetch existing notificationID
+	//2. clear that notification
+	//3. then create new notification createNotification(seconds)
 
 	// console.log("Global isPublic: ", isPublic);
 	// console.log("Quote: ", quote);
@@ -222,8 +255,19 @@ const GoalScreen = () => {
 					<Image style={styles.profilePic} source={{ uri: user.photoURL }} />
 				</TouchableOpacity>
 			</View>
-			<TouchableOpacity>
-				<Text>Learn how to Write a good goal</Text>
+			<TouchableOpacity
+				onPress={() => navigation.navigate("Goal Help Modal")}
+				style={{
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+					paddingTop: 1,
+					paddingBottom: 6,
+				}}
+			>
+				<Text style={{ fontSize: 14, textDecorationLine: "underline" }}>
+					Need Help? Learn how to Write a good goal
+				</Text>
 			</TouchableOpacity>
 			{/* <View style={[styles.CtaContainer, styles.cardShadow]}>
 				<Text style={styles.callToAction}>
@@ -331,10 +375,10 @@ const GoalScreen = () => {
 					title=" Feeling down? View a Quote"
 				></Button> */}
 			</KeyboardAvoidingView>
-			<Button title="clear Notifications" onPress={clearNotifications}></Button>
+			<Button title="Check Notifications" onPress={clearNotifications}></Button>
 			<Button
 				title="Schedule Notifications"
-				onPress={setNotifications}
+				onPress={createNotification}
 			></Button>
 		</ScrollView>
 	);
