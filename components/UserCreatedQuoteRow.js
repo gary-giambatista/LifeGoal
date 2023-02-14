@@ -38,7 +38,11 @@ const UserCreatedQuoteRow = ({ userQuote }) => {
 				onPress={() => {
 					touchToDeleteAlert();
 				}}
-				style={[styles.sectionContainer, styles.cardShadow]}
+				style={[
+					styles.sectionContainer,
+					styles.cardShadow,
+					theme === "dark" ? styles.sectionContainerDarkMode : null,
+				]}
 			>
 				<Text style={styles.quoteText}>{userQuote.userQuote}</Text>
 			</TouchableOpacity>
@@ -57,6 +61,10 @@ const styles = StyleSheet.create({
 		borderLeftWidth: 7,
 		borderColor: "#B4C4DB",
 	},
+	sectionContainerDarkMode: {
+		backgroundColor: "#5F5D8F",
+		borderColor: "#C2BFFF",
+	},
 	cardShadow: {
 		shadowColor: "000",
 		shadowOffset: {
@@ -68,14 +76,9 @@ const styles = StyleSheet.create({
 
 		elevation: 2,
 	},
-	sectionTitle: {
-		marginLeft: 12,
-		marginRight: 10,
-		fontSize: 20,
-	},
 	quoteText: {
-		fontSize: 18,
-		fontStyle: "italic",
+		fontSize: 19,
+		fontFamily: "PhiloItalic",
 		padding: 13,
 		// fontFamily: "FuzzyBubblesRegular",
 	},

@@ -38,7 +38,8 @@ const styles = StyleSheet.create({
 		borderColor: "#658AC2",
 	},
 	darkModeRowContainer: {
-		backgroundColor: "#0E1A28",
+		backgroundColor: "#5F5D8F",
+		borderColor: "#8A86CF",
 		borderRadius: 10,
 	},
 	cardShadow: {
@@ -52,8 +53,11 @@ const styles = StyleSheet.create({
 
 		elevation: 2,
 	},
-	goalText: {},
+	goalText: {
+		fontSize: 19,
+		fontFamily: "PhiloItalic",
+	},
 	darkmodeGoalText: {
-		color: "#8899A6",
+		color: "black",
 	},
 });

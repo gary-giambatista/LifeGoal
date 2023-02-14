@@ -56,8 +56,14 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 	return (
 		<View style={styles.componentContainer}>
 			{editing ? (
-				<View style={[styles.sectionContainer, styles.cardShadow]}>
-					<Text>Write Your Own Quote!</Text>
+				<View
+					style={[
+						styles.sectionContainer,
+						styles.cardShadow,
+						theme === "dark" ? styles.sectionContainerDarkMode : null,
+					]}
+				>
+					<Text style={{ fontSize: 16 }}>Write Your Own Quote!</Text>
 					<TextInput
 						multiline={true}
 						numberOfLines={5}
@@ -125,6 +131,10 @@ const styles = StyleSheet.create({
 		borderLeftWidth: 7,
 		borderColor: "#B4C4DB",
 	},
+	sectionContainerDarkMode: {
+		backgroundColor: "#5F5D8F",
+		borderColor: "#8A86CF",
+	},
 	cardShadow: {
 		shadowColor: "000",
 		shadowOffset: {
@@ -166,11 +176,11 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		color: "white",
 	},
-	sectionTitle: {
-		marginLeft: 12,
-		marginRight: 10,
-		fontSize: 20,
-	},
+	// sectionTitle: {
+	// 	marginLeft: 12,
+	// 	marginRight: 10,
+	// 	fontSize: 20,
+	// },
 	// quoteText: {
 	// 	fontSize: 14,
 

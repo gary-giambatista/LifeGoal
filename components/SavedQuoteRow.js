@@ -81,7 +81,8 @@ const styles = StyleSheet.create({
 		borderColor: "#658AC2",
 	},
 	darkModeRowContainer: {
-		backgroundColor: "#0E1A28",
+		backgroundColor: "#5F5D8F",
+		borderColor: "#8A86CF",
 		borderRadius: 10,
 	},
 	cardShadow: {
@@ -98,23 +99,24 @@ const styles = StyleSheet.create({
 	quoteText: {
 		// lineHeight: 28,
 		// fontWeight: "bold",
-		fontSize: 18,
-		fontStyle: "italic",
+		fontSize: 19,
+		fontFamily: "PhiloItalic",
 		paddingTop: 25,
 		paddingRight: 20,
 		paddingLeft: 25,
 		paddingBottom: 0,
 	},
 	darkModeQuoteText: {
-		color: "#8899A6",
+		color: "black",
 	},
 	darkModeText: {
-		color: "#4C5F75",
+		color: "#222133",
 	},
 	authorText: {
-		fontSize: 14,
+		fontSize: 16,
 		fontStyle: "italic",
 		textAlign: "right",
 		padding: 10,
+		paddingRight: 15,
 	},
 });

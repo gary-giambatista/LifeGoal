@@ -16,7 +16,12 @@ const GoalHelpModal = () => {
 	const { user, theme } = useAuth();
 	const [tips, setTips] = useState(tipData);
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: "#2C2B42" }}>
+		<SafeAreaView
+			style={[
+				styles.modalContainer,
+				theme === "dark" ? styles.modalContainerDarkMode : null,
+			]}
+		>
 			{/* Header for "Goal Feed" screen */}
 			<View
 				style={[
@@ -97,6 +102,12 @@ const tipData = [
 	},
 ];
 const styles = StyleSheet.create({
+	modalContainer: {
+		flex: 1,
+	},
+	modalContainerDarkMode: {
+		backgroundColor: "#2C2B42",
+	},
 	chatListContainer: {
 		height: "89%",
 		overflow: "scroll",

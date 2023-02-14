@@ -187,36 +187,35 @@ const GoalScreen = () => {
 		console.log(`3. notification ${notifications} set for 15 seconds`);
 		//can save notifications in state if need access to the notification ID
 	}
-	// // CHECKING NOTIFICATIONS Step 0
+	// CHECKING NOTIFICATIONS Step 0
 	// console.log("0. NOTIFICATION STATE: ", notification);
 
-	// //CHECK IF NOTIFICATION EXISTS - only ON initial APP START
-	// useEffect(() => {
-	// 	const isScheduledNotification = async () => {
-	// 		try {
-	// 			await Notifications.getAllScheduledNotificationsAsync().then(
-	// 				(result) => {
-	// 					console.log("1. RESULT: ", result, result.length);
-	// 					result.length === 0
-	// 						? setNotification(false)
-	// 						: setNotification(true);
-	// 				}
-	// 			);
-	// 		} catch (error) {
-	// 			console.log(error);
-	// 		}
-	// 	};
-	// 	isScheduledNotification();
-	// }, []);
-	// //**DO I NEED TO UPDATE setNotification(state) ?*/
+	//CHECK IF NOTIFICATION EXISTS - only ON initial APP START
+	useEffect(() => {
+		const isScheduledNotification = async () => {
+			try {
+				await Notifications.getAllScheduledNotificationsAsync().then(
+					(result) => {
+						// console.log("1. RESULT: ", result, result.length);
+						result.length === 0
+							? setNotification(false)
+							: setNotification(true);
+					}
+				);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+		isScheduledNotification();
+	}, []);
 
-	// //CREATE or DON'T CREATE Notification
-	// useEffect(() => {
-	// 	if (notification === false) {
-	// 		console.log("2. NEW NOTIFICATION TRIGGERED");
-	// 		createNotification();
-	// 	} else console.log("2. NEW NOTIFICATION NOT TRIGGERED");
-	// }, [notification]);
+	//CREATE or DON'T CREATE Notification
+	useEffect(() => {
+		if (notification === false) {
+			// console.log("2. NEW NOTIFICATION TRIGGERED");
+			createNotification();
+		} else console.log("2. NEW NOTIFICATION NOT TRIGGERED");
+	}, [notification]);
 
 	//**To Update Notification */
 	//0. IF cancel all works, and doesn't cancel other apps notifcations use that
@@ -267,7 +266,12 @@ const GoalScreen = () => {
 					paddingBottom: 6,
 				}}
 			>
-				<Text style={{ fontSize: 14, textDecorationLine: "underline" }}>
+				<Text
+					style={[
+						styles.helpText,
+						theme === "dark" ? styles.helpTextDarkMode : null,
+					]}
+				>
 					Need Help? Learn how to Write a good goal
 				</Text>
 			</TouchableOpacity>
@@ -280,7 +284,13 @@ const GoalScreen = () => {
 			<KeyboardAvoidingView style={{ flex: 1 }}>
 				{/* PlaceHolder Goal or user's Goal if they have one and not editing */}
 				{goal.length === 0 || editing ? (
-					<View style={[styles.placeholderContainer, styles.cardShadow]}>
+					<View
+						style={[
+							styles.placeholderContainer,
+							styles.cardShadow,
+							theme === "dark" ? styles.placeholderContainerDarkMode : null,
+						]}
+					>
 						<Text style={styles.placeholderText}>
 							Describe your goal here, your dream, the ideal world you are
 							striving to create and live in. It is something that you can
@@ -304,8 +314,12 @@ const GoalScreen = () => {
 						ref={inputRef}
 						multiline={true}
 						numberOfLines={5}
-						style={styles.input}
+						style={[
+							styles.input,
+							theme === "dark" ? styles.inputDarkMode : null,
+						]}
 						placeholder="Write your goal here..."
+						placeholderTextColor="grey"
 						onChangeText={setGoal}
 						value={goal}
 						editable={editing}
@@ -317,6 +331,7 @@ const GoalScreen = () => {
 							styles.editButton,
 							editing ? styles.editingNow : null,
 							theme === "dark" ? styles.darkButton : null,
+							editing && theme === "dark" ? styles.editingDarkMode : null,
 						]}
 						onPress={editing ? saveGoal : editGoal}
 					>
@@ -324,7 +339,14 @@ const GoalScreen = () => {
 							{editing ? "Save Goal" : "Edit Goal"}{" "}
 						</Text>
 					</TouchableOpacity>
-					<Text style={styles.switchText}>Share your goal anonymously... </Text>
+					<Text
+						style={[
+							styles.switchText,
+							theme === "dark" ? styles.switchTextDarkMode : null,
+						]}
+					>
+						Share your goal anonymously...{" "}
+					</Text>
 					{/* changes Which switch is shown. isPublic state issue required 2 Switches instead of a conditional for onValueChange/Value */}
 					{isPublic ? (
 						<Switch
@@ -421,7 +443,7 @@ const styles = StyleSheet.create({
 	screenBGDark: {
 		// backgroundColor: "#3C3B4F", L c1
 		// backgroundColor: "#2C2B42", C2
-		backgroundColor: "#2C2B42", //#35334F
+		backgroundColor: "#2C2B42", //#35334F Body color
 	},
 	profilePic: {
 		height: 40,
@@ -456,7 +478,7 @@ const styles = StyleSheet.create({
 		// backgroundColor: "#2A243B", C2
 		// borderBottomColor: "#3C3B4F",
 		// borderBottomWidth: 1,
-		backgroundColor: "#222133",
+		backgroundColor: "#222133", //Header color
 		// backgroundColor: "#5F5D8F",
 	},
 	logo: {
@@ -479,6 +501,13 @@ const styles = StyleSheet.create({
 	},
 	darkModeTitle: {
 		color: "white",
+	},
+	helpText: {
+		fontSize: 14,
+		textDecorationLine: "underline",
+	},
+	helpTextDarkMode: {
+		color: "grey",
 	},
 	cardShadow: {
 		shadowColor: "000",
@@ -578,6 +607,9 @@ const styles = StyleSheet.create({
 		marginRight: 10,
 		marginLeft: 10,
 	},
+	inputDarkMode: {
+		color: "white",
+	},
 	switchContainer: {
 		display: "flex",
 		flexDirection: "row",
@@ -607,10 +639,19 @@ const styles = StyleSheet.create({
 	editingNow: {
 		backgroundColor: "#C29C51",
 	},
+	editingDarkMode: {
+		backgroundColor: "#524BD7",
+	},
 	editButtonText: {
 		// fontFamily: "PhiloReg",
 		// fontSize: 15,
 		// letterSpacing: 1,
+		color: "white",
+	},
+	switchText: {
+		fontSize: 14,
+	},
+	switchTextDarkMode: {
 		color: "white",
 	},
 	quoteButtonContainer: {

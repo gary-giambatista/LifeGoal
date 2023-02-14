@@ -18,10 +18,10 @@ const B_MainTabNavigator = () => {
 		<Tab.Navigator
 			initialRouteName="Goal Screen Tab Container"
 			screenOptions={{
-				tabBarActiveTintColor: theme === "dark" ? "#928FDB" : "#658AC2",
+				tabBarActiveTintColor: theme === "dark" ? "#928FDB" : "#222F42",
 				headerShown: false,
-				tabBarActiveBackgroundColor: "#2C2B42",
-				tabBarInactiveBackgroundColor: "#222133",
+				tabBarActiveBackgroundColor: theme === "dark" ? "#2C2B42" : undefined,
+				tabBarInactiveBackgroundColor: theme === "dark" ? "#222133" : undefined,
 			}}
 		>
 			<Tab.Screen

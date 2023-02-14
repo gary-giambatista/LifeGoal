@@ -127,7 +127,7 @@ const GoalFeedList = () => {
 				<Text
 					style={[
 						styles.pageTitle,
-						theme === "dark" ? styles.darkModeTitle : null,
+						theme === "dark" ? styles.pageTitleDarkMode : null,
 					]}
 				>
 					Goal Feed
@@ -136,10 +136,21 @@ const GoalFeedList = () => {
 					onPress={getGoalsButton}
 					style={styles.refreshIconContainer}
 				>
-					<SimpleLineIcons name="refresh" size={24} color="#222F42" />
+					<SimpleLineIcons
+						name="refresh"
+						size={24}
+						color={theme === "dark" ? "#8A86CF" : "#222F42"}
+					/>
 				</TouchableOpacity>
 			</View>
-			{isloading ? <ActivityIndicator style={{ padding: 8 }} /> : null}
+			{isloading ? (
+				<ActivityIndicator
+					style={[
+						styles.topActivityIndicator,
+						theme === "dark" ? styles.topActivityIndicatorDarkMode : null,
+					]}
+				/>
+			) : null}
 			{/* Map out the Quote's using a <SavedQuoteRow component */}
 			<FlatList
 				style={[
@@ -154,7 +165,12 @@ const GoalFeedList = () => {
 				scrollEventThrottle={500}
 				ListFooterComponent={() =>
 					isLastGoal ? (
-						<Text style={styles.noMoreGoalsText}>
+						<Text
+							style={[
+								styles.noMoreGoalsText,
+								theme === "dark" ? styles.noMoreGoalsTextDarkMode : null,
+							]}
+						>
 							Sorry! There are no more goals.{" "}
 						</Text>
 					) : (
@@ -170,11 +186,11 @@ export default GoalFeedList;
 
 const styles = StyleSheet.create({
 	chatListContainer: {
-		height: "89%",
+		height: "91%",
 		overflow: "scroll",
 	},
 	darkModeChatListContainer: {
-		backgroundColor: "#2B3642",
+		backgroundColor: "#2C2B42",
 	},
 	noMatchText: {
 		padding: 20,
@@ -192,21 +208,30 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		alignItems: "baseline",
 		backgroundColor: "white",
-		marginBottom: 5,
 		paddingBottom: 5,
 		// borderBottomWidth: 1,
 		// borderBottomColor: "#8899A6",
 	},
 	darkModeBG: {
-		backgroundColor: "#0E1A28",
+		backgroundColor: "#222133",
 	},
 	pageTitle: {
-		fontFamily: "FuzzyBubblesBold",
-		fontSize: 30,
+		fontFamily: "PhiloBold",
+		fontSize: 32,
 		color: "#222F42",
+		letterSpacing: 1,
+	},
+	pageTitleDarkMode: {
+		color: "white",
 	},
 	refreshIconContainer: {
 		// marginLeft: "auto",
+	},
+	topActivityIndicator: {
+		padding: 8,
+	},
+	topActivityIndicatorDarkMode: {
+		backgroundColor: "#2C2B42",
 	},
 	cardShadow: {
 		shadowColor: "000",
@@ -223,5 +248,9 @@ const styles = StyleSheet.create({
 		fontSize: 15,
 		textAlign: "center",
 		padding: 8,
+		paddingBottom: 20,
+	},
+	noMoreGoalsTextDarkMode: {
+		color: "white",
 	},
 });

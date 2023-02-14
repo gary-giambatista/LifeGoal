@@ -7,6 +7,7 @@ const SavedQuotesScreen = () => {
 		<View>
 			{/* Quote List > Quote Row Components */}
 			<SavedQuoteList />
+			<Text>Testing</Text>
 		</View>
 	);
 };

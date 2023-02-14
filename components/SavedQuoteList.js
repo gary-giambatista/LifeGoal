@@ -8,6 +8,7 @@ import {
 	SectionList,
 	StyleSheet,
 	Text,
+	TouchableOpacity,
 	View,
 } from "react-native";
 import { useAuth } from "../hooks/useAuth";
@@ -76,7 +77,12 @@ const SavedQuoteList = () => {
 
 	// console.log(quotes);
 	return (
-		<View>
+		<ScrollView
+			style={[
+				styles.userMadeQuotesContainer,
+				theme === "dark" ? styles.userMadeQuotesContainerDarkMode : null,
+			]}
+		>
 			{/* {isLoading ? <ActivityIndicator /> : null} */}
 			{/* Header for "Saved Quotes" screen */}
 			<View
@@ -100,7 +106,7 @@ const SavedQuoteList = () => {
 					onPress={() => setEditing(true)}
 					name="plus"
 					size={24}
-					color="#222F42"
+					color={theme === "dark" ? "#8A86CF" : "#222F42"}
 				/>
 				{/* {!editing ? (
 					<AntDesign
@@ -133,28 +139,51 @@ const SavedQuoteList = () => {
 					renderItem={({ item }) => <SavedQuoteRow quote={item} />}
 				/>
 			) : (
-				<Text style={styles.noMatchText}>You have no saved quotes yet.</Text>
+				// <TouchableOpacity
+				// 	stlye={[
+				// 		styles.endBlock,
+				// 		theme === "dark" ? styles.endBlockDarkMode : null,
+				// 	]}
+				// >
+				// 	<Text>TESTING</Text>
+				// </TouchableOpacity>
+
+				<View
+					style={[
+						styles.noMatchContainer,
+						theme === "dark" ? styles.noMatchContainerDarkMode : null,
+					]}
+				>
+					<Text
+						style={[
+							styles.noMatchText,
+							theme === "dark" ? styles.noMatchTextDarkMode : null,
+						]}
+					>
+						You have no saved quotes yet.
+					</Text>
+				</View>
 			)}
-		</View>
+		</ScrollView>
 	);
 };
 
 export default SavedQuoteList;
 
 const styles = StyleSheet.create({
+	userMadeQuotesContainer: {
+		height: "100%", // TOOK WHOLE SCREEN
+	},
+	userMadeQuotesContainerDarkMode: {
+		backgroundColor: "#2C2B42",
+	},
 	chatListContainer: {
+		// height: "100%",
 		// height: "89%",
 		// overflow: "scroll",
 	},
 	darkModeChatListContainer: {
-		backgroundColor: "#2B3642",
-	},
-	noMatchText: {
-		padding: 20,
-		textAlign: "center",
-		lineHeight: 28,
-		fontSize: 18,
-		fontWeight: "bold",
+		backgroundColor: "#2C2B42",
 	},
 	HeaderContainer: {
 		paddingTop: 22,
@@ -171,16 +200,17 @@ const styles = StyleSheet.create({
 		// borderBottomColor: "#8899A6",
 	},
 	darkModeBG: {
-		backgroundColor: "#0E1A28",
+		backgroundColor: "#222133",
 	},
 	darkModeTitle: {
-		color: "#8899A6",
+		color: "white",
 	},
 	pageTitle: {
-		paddingLeft: 28,
-		fontFamily: "FuzzyBubblesBold",
-		fontSize: 30,
+		paddingLeft: 26,
+		fontFamily: "PhiloBold",
+		fontSize: 32,
 		color: "#222F42",
+		letterSpacing: 1,
 	},
 	cardShadow: {
 		shadowColor: "000",
@@ -193,10 +223,27 @@ const styles = StyleSheet.create({
 
 		elevation: 2,
 	},
-	darkModeQuoteText: {
-		color: "#8899A6",
+	noMatchContainer: {
+		display: "flex",
+		flexDirection: "column",
+		justifyContent: "center",
+		alignItems: "center",
+		// height: "100%",
 	},
-	darkModeText: {
-		color: "#4C5F75",
+	noMatchContainerDarkMode: {},
+	noMatchText: {
+		fontFamily: "PhiloBold",
+		fontSize: 19,
+		paddingTop: 15,
+		padding: 10,
 	},
+	noMatchTextDarkMode: {
+		color: "white",
+	},
+	// endBlock: {
+	// 	backgroundColor: "black",
+	// },
+	// endBlockDarkMode: {
+	// 	backgroundColor: "#2C2B42",
+	// },
 });
