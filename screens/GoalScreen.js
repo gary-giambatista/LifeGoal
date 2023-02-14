@@ -22,6 +22,7 @@ import {
 	Switch,
 	Text,
 	TextInput,
+	ToastAndroid,
 	TouchableOpacity,
 	View,
 } from "react-native";
@@ -158,6 +159,8 @@ const GoalScreen = () => {
 				quoteAuthor: quoteAuthor,
 			})
 			.then(() => {
+				//insert toast
+				ToastAndroid.show("Quote Saved successfully!", ToastAndroid.SHORT);
 				console.log("Quote Saved!");
 			});
 	}

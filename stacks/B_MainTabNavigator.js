@@ -1,5 +1,7 @@
 import {
 	AntDesign,
+	Feather,
+	Foundation,
 	Ionicons,
 	MaterialCommunityIcons,
 } from "@expo/vector-icons";
@@ -7,6 +9,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
 import { useAuth } from "../hooks/useAuth";
 import GoalFeed from "../screens/GoalFeed";
+import PlanScreen from "../screens/PlanScreen";
 import SavedQuotesScreen from "../screens/SavedQuotesScreen";
 import C_SubStackNavigator from "./C_SubStackNavigator";
 
@@ -43,9 +46,25 @@ const B_MainTabNavigator = () => {
 				name="Goal Screen Tab Container"
 				component={C_SubStackNavigator}
 				options={{
-					tabBarLabel: "Home",
+					tabBarLabel: "My Goal",
 					tabBarIcon: ({ color, size }) => (
-						<Ionicons name="ios-home" size={size} color={color} />
+						// <Ionicons name="ios-home" size={size} color={color} />
+						<Feather name="target" size={size} color={color} />
+						// <Foundation name="trees" size={size} color={color} />
+					),
+				}}
+			/>
+			<Tab.Screen
+				name="Plan Screen"
+				component={PlanScreen}
+				options={{
+					tabBarLabel: "My Plans",
+					tabBarIcon: ({ color, size }) => (
+						<MaterialCommunityIcons
+							name="floor-plan"
+							size={size}
+							color={color}
+						/>
 					),
 				}}
 			/>
