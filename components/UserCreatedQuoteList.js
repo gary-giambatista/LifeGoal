@@ -48,6 +48,7 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 			})
 			.then(() => {
 				setEditing(false);
+				setUserQuote("");
 				console.log("Quote Saved!");
 			});
 	}
@@ -73,12 +74,15 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 						value={userQuote}
 						editable={editing}
 					/>
+					{userQuote && userQuote.length < 5 ? (
+						<Text>Quote must be at least 5 characters</Text>
+					) : null}
 					<View style={{ display: "flex", flexDirection: "row" }}>
 						<TouchableOpacity
 							onPress={() => {
 								createUserQuote();
 							}}
-							disabled={!editing}
+							disabled={!editing || userQuote.length < 5}
 							style={styles.saveButton}
 						>
 							<Text style={styles.buttonText}>Save</Text>
