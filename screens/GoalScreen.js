@@ -1,4 +1,4 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons, Octicons } from "@expo/vector-icons";
 import firestore from "@react-native-firebase/firestore";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as Notifications from "expo-notifications";
@@ -51,6 +51,28 @@ const GoalScreen = () => {
 	const [quoteAuthor, setQuoteAuthor] = useState("");
 	const [isFetching, setIsFetching] = useState(false);
 	const [notification, setNotification] = useState(null);
+	const [isLoading, setIsLoading] = useState(false);
+
+	//GET: fetch user's goal data from Firebase
+	useEffect(() => {
+		setIsLoading(true);
+		async function fetchUserGoal() {
+			const data = await firestore()
+				.collection("Goals")
+				.doc(`${user.uid}`)
+				.get();
+			// console.log("user data: ", data.data().goal);
+			if (data.data().goal) {
+				setGoal(data.data().goal);
+				setIsPublic(data.data().isPublic);
+			}
+		}
+		fetchUserGoal();
+	}, []);
+
+	useEffect(() => {
+		isLoading ? setIsLoading(false) : console.log("NOT LOADING");
+	}, [goal]);
 
 	function editGoal() {
 		setEditing(true);
@@ -117,20 +139,6 @@ const GoalScreen = () => {
 
 		setIsPublic((prevPublicState) => !prevPublicState);
 	}
-	useEffect(() => {
-		async function fetchUserData() {
-			const data = await firestore()
-				.collection("Goals")
-				.doc(`${user.uid}`)
-				.get();
-			// console.log("user data: ", data.data().goal);
-			if (data.data().goal) {
-				setGoal(data.data().goal);
-				setIsPublic(data.data().isPublic);
-			}
-		}
-		fetchUserData();
-	}, []);
 
 	async function fetchQuote() {
 		setIsFetching(true);
@@ -263,6 +271,7 @@ const GoalScreen = () => {
 				onPress={() => navigation.navigate("Goal Help Modal")}
 				style={{
 					display: "flex",
+					flexDirection: "row",
 					alignItems: "center",
 					justifyContent: "center",
 					paddingTop: 1,
@@ -277,6 +286,12 @@ const GoalScreen = () => {
 				>
 					Need Help? Learn how to Write a good goal
 				</Text>
+				<Octicons
+					name="info"
+					size={15}
+					color={theme === "dark" ? "#8A86CF" : "#222F42"}
+					style={{ paddingLeft: 5 }}
+				/>
 			</TouchableOpacity>
 			{/* <View style={[styles.CtaContainer, styles.cardShadow]}>
 				<Text style={styles.callToAction}>
@@ -285,7 +300,7 @@ const GoalScreen = () => {
 			</View> */}
 			{/* Goal Card Section */}
 			<KeyboardAvoidingView style={{ flex: 1 }}>
-				{/* PlaceHolder Goal or user's Goal if they have one and not editing */}
+				{/* TERNARY: PlaceHolder Goal or user's Goal if they have one and not editing */}
 				{goal.length === 0 || editing ? (
 					<View
 						style={[
@@ -294,11 +309,16 @@ const GoalScreen = () => {
 							theme === "dark" ? styles.placeholderContainerDarkMode : null,
 						]}
 					>
-						<Text style={styles.placeholderText}>
-							Describe your goal here, your dream, the ideal world you are
-							striving to create and live in. It is something that you can
-							always strive for, no matter where you are in your life...
-						</Text>
+						{/* NESTED Ternary: if loading put activity indicator instead of placeholder */}
+						{isLoading ? (
+							<ActivityIndicator />
+						) : (
+							<Text style={styles.placeholderText}>
+								Describe your goal here, your dream, the ideal world you are
+								striving to create and live in. It is something that you can
+								always strive for, no matter where you are in your life...
+							</Text>
+						)}
 					</View>
 				) : (
 					<View

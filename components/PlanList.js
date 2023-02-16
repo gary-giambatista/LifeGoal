@@ -18,7 +18,6 @@ import PlanRow from "./PlanRow";
 const PlanList = () => {
 	const { user, theme } = useAuth();
 	const [plans, setPlans] = useState([]);
-	const [tEST, setTEST] = useState([]);
 	const [plan, setPlan] = useState("");
 	const [editing, setEditing] = useState(false);
 	const [infoOn, setInfoOn] = useState(false);

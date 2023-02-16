@@ -42,7 +42,7 @@ const SavedQuoteList = () => {
 		isLoading ? setIsLoading(false) : console.log("NOT LOADING");
 	}, [quotes]);
 
-	console.log(isLoading);
+	// console.log(isLoading);
 
 	return (
 		<ScrollView
