@@ -16,14 +16,14 @@ import SavedQuoteRow from "./SavedQuoteRow";
 import UserCreatedQuoteList from "./UserCreatedQuoteList";
 
 const SavedQuoteList = () => {
-	//fetch user's Saved quotes
 	const { user, theme } = useAuth();
 	const [quotes, setQuotes] = useState([]);
-	// const [sortedQuotes, setSortedQuotes] = useState([]);
 	const [editing, setEditing] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	// FETCH: db listener for SAVED QUOTES
 	useEffect(() => {
+		setIsLoading(true);
 		firestore()
 			.collection("Quotes")
 			.where("userId", "==", user.uid)
@@ -38,44 +38,12 @@ const SavedQuoteList = () => {
 			});
 	}, [user]);
 
-	//TODO: sort quotes by createdAt: {nanoseconds: , seconds:} Unix time format
-	// **Setting the Quote order to be descending in order by createdAt date
-	//nanoseconds/seconds
-	//quotes[i].createdAt
-	// console.log(quotes[0].createdAt);
-	// SORT METHOD<><>PROBABLY DON'T NEED<><>**
-	// useEffect(() => {
-	// 	setSortedQuotes(
-	// 		quotes.sort((a, b) => {
-	// 			try {
-	// 				// console.log(b.createdAt.seconds);
-	// 				return b.createdAt.seconds - a.createdAt.seconds;
-	// 			} catch (error) {
-	// 				// console.log(error);
-	// 				// console.log("createdAt A", a.createdAt);
-	// 				// console.log("createdAt B", b.createdAt);
-	// 				return 0;
-	// 			}
-	// 		})
-	// 	);
-	// }, [quotes]);
+	useEffect(() => {
+		isLoading ? setIsLoading(false) : console.log("NOT LOADING");
+	}, [quotes]);
 
-	// console.log(sortedQuotes);
-	// const newQuotes = quotes.sort((a, b) => {
-	// 	// console.log(b.createdAt.seconds);
-	// 	b.createdAt.seconds - a.createdAt.seconds;
-	// });
-	// console.log(newQuotes);
+	console.log(isLoading);
 
-	//TODO Add delete function
-	//SEPARATE add a function to delete quotes and pass to SavedQuoteRow(use id: doc.id to reference correct quote to delete )
-
-	//ADDING User made quotes
-	//DO in UserCreated Quotes?
-	// fetch user's quotes
-	// create a user quote
-
-	// console.log(quotes);
 	return (
 		<ScrollView
 			style={[
@@ -83,7 +51,6 @@ const SavedQuoteList = () => {
 				theme === "dark" ? styles.userMadeQuotesContainerDarkMode : null,
 			]}
 		>
-			{/* {isLoading ? <ActivityIndicator /> : null} */}
 			{/* Header for "Saved Quotes" screen */}
 			<View
 				style={[
@@ -108,27 +75,16 @@ const SavedQuoteList = () => {
 					size={24}
 					color={theme === "dark" ? "#8A86CF" : "#222F42"}
 				/>
-				{/* {!editing ? (
-					<AntDesign
-						onPress={() => setEditing((prevEditing) => !prevEditing)}
-						name="plus"
-						size={24}
-						color="#222F42"
-					/>
-				) : (
-					<AntDesign
-						onPress={() => setEditing((prevEditing) => !prevEditing)}
-						name="check"
-						size={24}
-						color="#222F42"
-					/>
-				)} */}
 			</View>
+
 			{/* USER CREATED QUOTES section */}
 			<UserCreatedQuoteList editing={editing} setEditing={setEditing} />
-			{/* SAVED QUOTES Section 
-			Map out the Quote's using a <SavedQuoteRow component IF quotes exist*/}
-			{quotes.length > 0 ? (
+
+			{/* SAVED QUOTES Section */}
+			{isLoading ? <ActivityIndicator style={{ padding: 8 }} /> : null}
+
+			{/* IF quotes & not loading map them out */}
+			{quotes.length > 0 && !isLoading ? (
 				<FlatList
 					style={[
 						styles.chatListContainer,
@@ -138,16 +94,9 @@ const SavedQuoteList = () => {
 					keyExtractor={(item) => item.id}
 					renderItem={({ item }) => <SavedQuoteRow quote={item} />}
 				/>
-			) : (
-				// <TouchableOpacity
-				// 	stlye={[
-				// 		styles.endBlock,
-				// 		theme === "dark" ? styles.endBlockDarkMode : null,
-				// 	]}
-				// >
-				// 	<Text>TESTING</Text>
-				// </TouchableOpacity>
-
+			) : // NESTED TERNARY: if no quotes && if loading
+			// don't show the "no saved quotes yet" msg
+			isLoading ? null : (
 				<View
 					style={[
 						styles.noMatchContainer,

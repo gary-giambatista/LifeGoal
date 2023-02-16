@@ -172,7 +172,7 @@ const GoalScreen = () => {
 		const notificationId =
 			await Notifications.getAllScheduledNotificationsAsync();
 		console.log(notificationId);
-		// Notifications.dismissAllNotificationsAsync();
+		// Notifications.dismissAllNotificationsAsync(); SEEMS LIKE THIS WORKS FOR ONLY THIS APPS notifications ! GOOD
 	}
 
 	// CREATE NOTIFICATION FUNCTION

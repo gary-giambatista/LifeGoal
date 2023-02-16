@@ -163,7 +163,14 @@ const PlanList = () => {
 						editable={editing}
 					/>
 					{plan && plan.length < 5 ? (
-						<Text>Quote must be at least 5 characters</Text>
+						<Text
+							style={[
+								styles.planRequirementsText,
+								theme === "dark" ? styles.planRequirementsTextDarkMode : null,
+							]}
+						>
+							Plan must be at least 5 characters
+						</Text>
 					) : null}
 					<View style={{ display: "flex", flexDirection: "row" }}>
 						<TouchableOpacity
@@ -333,6 +340,10 @@ const styles = StyleSheet.create({
 		backgroundColor: "#5F5D8F",
 		borderColor: "#8A86CF",
 	},
+	planRequirementsText: {
+		paddingBottom: 5,
+	},
+	planRequirementsTextDarkMode: {},
 	cardShadow: {
 		shadowColor: "000",
 		shadowOffset: {

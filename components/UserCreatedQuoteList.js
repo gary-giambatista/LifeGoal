@@ -14,12 +14,14 @@ import { useAuth } from "../hooks/useAuth";
 import UserCreatedQuoteRow from "./UserCreatedQuoteRow";
 
 const UserCreatedQuoteList = ({ editing, setEditing }) => {
+	const { user, theme } = useAuth();
 	const [userQuotes, setUserQuotes] = useState([]);
 	const [userQuote, setUserQuote] = useState("");
-	const { user, theme } = useAuth();
+	// const [isLoading, setIsLoading] = useState(false);
 
 	// FETCH: live listener for "UserQuotes" collection
 	useEffect(() => {
+		// setIsLoading(true);
 		firestore()
 			.collection("UserQuotes")
 			.where("userId", "==", user.uid)
@@ -34,6 +36,11 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 			});
 	}, [user]);
 
+	// useEffect(() => {
+	// 	isLoading ? setIsLoading(false) : console.log("NOT LOADING");
+	// }, [userQuotes]);
+
+	// console.log(isLoading);
 	//use userQuote from TextInput to write to DB and create UserQuotes collection
 	// WRITE FUNCTION: onPress of "Save" button > create UserQuote using userQuote state
 	async function createUserQuote() {
@@ -56,6 +63,7 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 
 	return (
 		<View style={styles.componentContainer}>
+			{/* {isLoading ? <ActivityIndicator style={{ padding: 8 }} /> : null} */}
 			{editing ? (
 				<View
 					style={[
@@ -75,7 +83,9 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 						editable={editing}
 					/>
 					{userQuote && userQuote.length < 5 ? (
-						<Text>Quote must be at least 5 characters</Text>
+						<Text style={{ paddingBottom: 5 }}>
+							Quote must be at least 5 characters
+						</Text>
 					) : null}
 					<View style={{ display: "flex", flexDirection: "row" }}>
 						<TouchableOpacity
@@ -99,7 +109,8 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 					</View>
 				</View>
 			) : null}
-			{userQuotes || (userQuote && !editing) ? (
+			{/* {userQuotes || (userQuote && !editing) ? ( */}
+			{userQuotes.length > 0 ? (
 				<View>
 					{/* <Text style={styles.sectionTitle}>Your quotes</Text> */}
 					{/* try sectionlist here */}
@@ -108,16 +119,10 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 						data={userQuotes}
 						keyExtractor={(item) => item.id}
 						renderItem={({ item }) => <UserCreatedQuoteRow userQuote={item} />}
-						// ListFooterComponent={() => {
-						// 	userQuotes.length === 0 ? null : (
-						// 		<ActivityIndicator style={{ padding: 8 }} />
-						// 	);
-						// }}
 					/>
 				</View>
-			) : (
-				<ActivityIndicator style={{ padding: 8 }} />
-			)}
+			) : // <ActivityIndicator style={{ padding: 8 }} />
+			null}
 		</View>
 	);
 };
@@ -190,3 +195,21 @@ const styles = StyleSheet.create({
 
 	// },
 });
+
+// {userQuotes || (userQuote && !editing) ? (
+// 	<View>
+// 		{/* <Text style={styles.sectionTitle}>Your quotes</Text> */}
+// 		{/* try sectionlist here */}
+// 		{/* <UserCreatedQuoteRow userQuote={userQuote} /> */}
+// 		<FlatList
+// 			data={userQuotes}
+// 			keyExtractor={(item) => item.id}
+// 			renderItem={({ item }) => <UserCreatedQuoteRow userQuote={item} />}
+// 			ListFooterComponent={() => {
+// 				isLoading ? <ActivityIndicator style={{ padding: 8 }} /> : null;
+// 			}}
+// 		/>
+// 	</View>
+// ) : (
+// 	<ActivityIndicator style={{ padding: 8 }} />
+// )}
