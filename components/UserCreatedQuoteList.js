@@ -18,6 +18,7 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 	const [userQuotes, setUserQuotes] = useState([]);
 	const [userQuote, setUserQuote] = useState("");
 	// const [isLoading, setIsLoading] = useState(false);
+	// const inputRef = useRef(); add auto focus here when editing (creating a quote)
 
 	// FETCH: live listener for "UserQuotes" collection
 	useEffect(() => {
@@ -161,7 +162,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		paddingBottom: 2,
 		justifyContent: "center",
-		backgroundColor: "black",
 		height: 30,
 		width: 80,
 		backgroundColor: "#222F42",
@@ -174,7 +174,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		paddingBottom: 2,
 		justifyContent: "center",
-		backgroundColor: "black",
 		height: 30,
 		width: 80,
 		backgroundColor: "#993626",

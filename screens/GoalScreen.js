@@ -311,7 +311,9 @@ const GoalScreen = () => {
 					>
 						{/* NESTED Ternary: if loading put activity indicator instead of placeholder */}
 						{isLoading ? (
-							<ActivityIndicator />
+							<ActivityIndicator
+								style={{ paddingTop: 100, paddingBottom: 100 }}
+							/>
 						) : (
 							<Text style={styles.placeholderText}>
 								Describe your goal here, your dream, the ideal world you are
