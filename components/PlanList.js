@@ -27,7 +27,7 @@ const PlanList = () => {
 		firestore()
 			.collection("Plans")
 			.where("userId", "==", user.uid)
-			// .orderBy("createdAt", "desc")
+			.orderBy("createdAt", "desc")
 			.onSnapshot((snapshot) => {
 				setPlans(
 					snapshot.docs.map((doc) => ({

@@ -33,7 +33,7 @@ const UserCreatedQuoteRow = ({ userQuote }) => {
 			]
 		);
 
-	//userQuote.id (DOCUMENT ID)
+	//UPDATE PLAN: uses userQuote.id (DOCUMENT ID)
 	async function updateUserQuote() {
 		firestore()
 			.collection("UserQuotes")
