@@ -26,6 +26,7 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
+import SelectDropdown from "react-native-select-dropdown";
 import { useAuth } from "../hooks/useAuth";
 import GoalHelpModal from "./GoalHelpModal";
 
@@ -50,8 +51,11 @@ const GoalScreen = () => {
 	const [quote, setQuote] = useState("");
 	const [quoteAuthor, setQuoteAuthor] = useState("");
 	const [isFetching, setIsFetching] = useState(false);
-	const [notification, setNotification] = useState(null);
+	const [notification, setNotification] = useState(null); //check to see if notification exists
 	const [isLoading, setIsLoading] = useState(false);
+	const [notificationTimer, setNotificationTimer] = useState(8);
+
+	console.log("Notification Timer", notificationTimer);
 
 	//GET: fetch user's goal data from Firebase
 	useEffect(() => {
@@ -180,22 +184,44 @@ const GoalScreen = () => {
 		const notificationId =
 			await Notifications.getAllScheduledNotificationsAsync();
 		console.log(notificationId);
+		// Notifications.dismissAllNotificationsAsync();
+		Notifications.cancelAllScheduledNotificationsAsync();
 		// Notifications.dismissAllNotificationsAsync(); SEEMS LIKE THIS WORKS FOR ONLY THIS APPS notifications ! GOOD
 	}
+	const timeSetting = {
+		none: null,
+		"4 hours": 14400,
+		"6 hours": 21600,
+		"8 hours": 28800,
+		"10 hours": 36000,
+		"12 hours": 43200,
+		"14 hours": 50400,
+		"16 hours": 57600,
+		"24 hours": 86400,
+	};
 
-	// CREATE NOTIFICATION FUNCTION
-	async function createNotification() {
+	// CREATE NOTIFICATION FUNCTION - arguement is NUMBER: x 3600 for seconds in an hour. updateNotification takes notificationTimer not from state but from dropdown SelectDropdown element
+	async function createNotification(notificationTimer) {
 		const notifications = await Notifications.scheduleNotificationAsync({
 			content: {
 				title: "Remember to check your goal",
 				body: "Don't forget what you are working towards!",
 			},
 			trigger: {
-				seconds: 15,
-				// repeats: true,
+				seconds: notificationTimer * 3600,
+				//notificationTimer * 3600
+				// repeats: true, 3600 x number of hours
+				// {2 hours: 7200, }
+				//.seconds / to get into days
+				//the current date - the unix time converted to days
 			},
 		});
-		console.log(`3. notification ${notifications} set for 15 seconds`);
+		console.log(
+			`3. notification ${notifications} set for ${
+				notificationTimer * 3600
+			} seconds`
+		);
+		//${notificationTimer * 3600}
 		//can save notifications in state if need access to the notification ID
 	}
 	// CHECKING NOTIFICATIONS Step 0
@@ -224,7 +250,7 @@ const GoalScreen = () => {
 	useEffect(() => {
 		if (notification === false) {
 			// console.log("2. NEW NOTIFICATION TRIGGERED");
-			createNotification();
+			createNotification(notificationTimer);
 		} else console.log("2. NEW NOTIFICATION NOT TRIGGERED");
 	}, [notification]);
 
@@ -233,9 +259,16 @@ const GoalScreen = () => {
 	//1. fetch existing notificationID
 	//2. clear that notification
 	//3. then create new notification createNotification(seconds)
-
-	// console.log("Global isPublic: ", isPublic);
-	// console.log("Quote: ", quote);
+	async function updateNotification(notificationTimer) {
+		console.log("Update Notification CALLED");
+		try {
+			Notifications.cancelAllScheduledNotificationsAsync();
+			console.log("Notifications CANCELLED");
+			await createNotification(notificationTimer);
+		} catch (error) {
+			console.log(error);
+		}
+	}
 
 	return (
 		<ScrollView
@@ -450,14 +483,57 @@ const GoalScreen = () => {
 					title=" Feeling down? View a Quote"
 				></Button> */}
 			</KeyboardAvoidingView>
-			{/* <Button title="Check Notifications" onPress={clearNotifications}></Button>
+			<Button title="Check Notifications" onPress={clearNotifications}></Button>
 			<Button
 				title="Schedule Notifications"
 				onPress={createNotification}
-			></Button> */}
+			></Button>
+			<SelectDropdown
+				defaultValue={notificationTimer}
+				data={timeSettings2}
+				onSelect={(selectedItem, index) => {
+					console.log(selectedItem, index);
+					setNotificationTimer(selectedItem);
+					updateNotification(selectedItem);
+					//update notification
+				}}
+				buttonTextAfterSelection={(selectedItem, index) => {
+					// text represented after item is selected
+					// if data array is an array of objects then return selectedItem.property to render after item is selected
+					return `${selectedItem} hours`;
+				}}
+				rowTextForSelection={(item, index) => {
+					// text represented for each item in dropdown
+					// if data array is an array of objects then return item.property to represent item in dropdown
+					return `${item} hours`;
+				}}
+				// buttonStyle={[
+				// 	styles.notificationButton,
+				// 	theme === "dark" ? styles.notificationButtonDarkMode : null,
+				// ]}
+				// buttonTextStyle={[
+				// 	styles.notificationText,
+				// 	theme === "dark" ? styles.notificationTextDarkMode : null,
+				// ]}
+				buttonStyle={{
+					backgroundColor: theme === "dark" ? "black" : "white",
+					borderRadius: 10,
+					shadowColor: "000",
+					shadowOffset: {
+						width: 0,
+						height: 1,
+					},
+					shadowOpacity: 0.2,
+					shadowRadius: 1.41,
+
+					elevation: 2,
+					margin: 5,
+				}}
+			/>
 		</ScrollView>
 	);
 };
+const timeSettings2 = [4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 24];
 
 export default GoalScreen;
 
@@ -534,6 +610,15 @@ const styles = StyleSheet.create({
 	helpTextDarkMode: {
 		color: "grey",
 	},
+	notificationButton: {
+		borderRadius: 10,
+		backgroundColor: "blue",
+	},
+	notificationButtonDarkMode: {},
+	notificationText: {
+		fontSize: 14,
+	},
+	notificationTextDarkMode: {},
 	cardShadow: {
 		shadowColor: "000",
 		shadowOffset: {
