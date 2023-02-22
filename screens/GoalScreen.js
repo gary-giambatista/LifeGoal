@@ -1,6 +1,6 @@
-import { Ionicons, MaterialIcons, Octicons } from "@expo/vector-icons";
+import { Entypo, Ionicons, MaterialIcons, Octicons } from "@expo/vector-icons";
 import firestore from "@react-native-firebase/firestore";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import * as Notifications from "expo-notifications";
 import {
 	default as React,
@@ -53,7 +53,7 @@ const GoalScreen = () => {
 	const [isFetching, setIsFetching] = useState(false);
 	const [notification, setNotification] = useState(null); //check to see if notification exists
 	const [isLoading, setIsLoading] = useState(false);
-	const [notificationTimer, setNotificationTimer] = useState(8);
+	const [notificationTimer, setNotificationTimer] = useState(6);
 
 	console.log("Notification Timer", notificationTimer);
 
@@ -69,6 +69,7 @@ const GoalScreen = () => {
 			if (data.data().goal) {
 				setGoal(data.data().goal);
 				setIsPublic(data.data().isPublic);
+				setNotificationTimer(data.data().timer);
 			}
 		}
 		fetchUserGoal();
@@ -98,7 +99,7 @@ const GoalScreen = () => {
 				// lastEdited: firestore.FieldValue.serverTimestamp(),
 				isPublic: isPublic,
 				goal: goal,
-				// timer: 4, 6, 8,
+				timer: notificationTimer,
 			})
 			.then(() => {
 				console.log("Goal Updated!");
@@ -188,17 +189,8 @@ const GoalScreen = () => {
 		Notifications.cancelAllScheduledNotificationsAsync();
 		// Notifications.dismissAllNotificationsAsync(); SEEMS LIKE THIS WORKS FOR ONLY THIS APPS notifications ! GOOD
 	}
-	const timeSetting = {
-		none: null,
-		"4 hours": 14400,
-		"6 hours": 21600,
-		"8 hours": 28800,
-		"10 hours": 36000,
-		"12 hours": 43200,
-		"14 hours": 50400,
-		"16 hours": 57600,
-		"24 hours": 86400,
-	};
+
+	const timeSettings = [4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 24];
 
 	// CREATE NOTIFICATION FUNCTION - arguement is NUMBER: x 3600 for seconds in an hour. updateNotification takes notificationTimer not from state but from dropdown SelectDropdown element
 	async function createNotification(notificationTimer) {
@@ -265,9 +257,23 @@ const GoalScreen = () => {
 			Notifications.cancelAllScheduledNotificationsAsync();
 			console.log("Notifications CANCELLED");
 			await createNotification(notificationTimer);
+			//update goal notification timer here
+			await updateNotificationTimer(notificationTimer);
 		} catch (error) {
 			console.log(error);
 		}
+	}
+	//Update Firebase with new notification time > notificationTimer is a NUMBER from the SelectDropdown data={timeSettings}
+	async function updateNotificationTimer(notificationTimer) {
+		firestore()
+			.collection("Goals")
+			.doc(`${user.uid}`)
+			.update({
+				timer: notificationTimer,
+			})
+			.then(() => {
+				console.log("DB Timer updated!");
+			});
 	}
 
 	return (
@@ -296,7 +302,15 @@ const GoalScreen = () => {
 				>
 					My Goal
 				</Text>
-				<TouchableOpacity onPress={logOut}>
+				<TouchableOpacity
+					onPress={() =>
+						navigation.navigate("Profile", {
+							notificationTimer,
+							setNotificationTimer,
+							updateNotification,
+						})
+					}
+				>
 					<Image style={styles.profilePic} source={{ uri: user.photoURL }} />
 				</TouchableOpacity>
 			</View>
@@ -488,56 +502,91 @@ const GoalScreen = () => {
 				title="Schedule Notifications"
 				onPress={createNotification}
 			></Button>
-			<SelectDropdown
-				defaultValue={notificationTimer}
-				data={timeSettings2}
-				onSelect={(selectedItem, index) => {
-					console.log(selectedItem, index);
-					setNotificationTimer(selectedItem);
-					updateNotification(selectedItem);
-					//update notification
+			{/* <View
+				style={{
+					display: "flex",
+					flexDirection: "row",
+					alignItems: "center",
+					justifyContent: "center",
 				}}
-				buttonTextAfterSelection={(selectedItem, index) => {
-					// text represented after item is selected
-					// if data array is an array of objects then return selectedItem.property to render after item is selected
-					return `${selectedItem} hours`;
-				}}
-				rowTextForSelection={(item, index) => {
-					// text represented for each item in dropdown
-					// if data array is an array of objects then return item.property to represent item in dropdown
-					return `${item} hours`;
-				}}
-				// buttonStyle={[
-				// 	styles.notificationButton,
-				// 	theme === "dark" ? styles.notificationButtonDarkMode : null,
-				// ]}
-				// buttonTextStyle={[
-				// 	styles.notificationText,
-				// 	theme === "dark" ? styles.notificationTextDarkMode : null,
-				// ]}
-				buttonStyle={{
-					backgroundColor: theme === "dark" ? "black" : "white",
-					borderRadius: 10,
-					shadowColor: "000",
-					shadowOffset: {
-						width: 0,
-						height: 1,
-					},
-					shadowOpacity: 0.2,
-					shadowRadius: 1.41,
-
-					elevation: 2,
-					margin: 5,
-				}}
-			/>
+			>
+				<Text style={{ fontSize: 16 }}>Goal notification every:</Text>
+				<SelectDropdown
+					defaultValue={notificationTimer}
+					data={timeSettings}
+					onSelect={(selectedItem, index) => {
+						console.log(selectedItem, index);
+						setNotificationTimer(selectedItem);
+						updateNotification(selectedItem);
+					}}
+					buttonTextAfterSelection={(selectedItem, index) => {
+						return `${selectedItem} hours`;
+					}}
+					rowTextForSelection={(item, index) => {
+						return `${item} hours`;
+					}}
+					renderDropdownIcon={(isOpened) => {
+						return (
+							<Entypo
+								name="select-arrows"
+								size={24}
+								color={theme === "dark" ? "#222133" : "#222F42"}
+							/>
+						);
+					}}
+					// buttonStyle={[
+					// 	styles.dropdownButton,
+					// 	styles.cardShadow,
+					// 	theme === "dark" ? styles.dropdownButtonDarkMode : null,
+					// ]}
+					// buttonTextStyle={[
+					// 	styles.dropdownButtonText,
+					// 	theme === "dark" ? styles.dropdownButtonTextDarkMode : null,
+					// ]}
+					dropdownStyle={{
+						borderRadius: 10,
+						backgroundColor: theme === "dark" ? "#5F5D8F" : "white",
+					}}
+					rowStyle={styles.dropdownRow}
+					rowTextStyle={styles.dropdownRowText}
+					buttonStyle={{
+						backgroundColor: theme === "dark" ? "#5F5D8F" : "white",
+						borderRadius: 10,
+						shadowColor: "000",
+						shadowOffset: {
+							width: 0,
+							height: 1,
+						},
+						shadowOpacity: 0.2,
+						shadowRadius: 1.41,
+						elevation: 2,
+						margin: 10,
+						width: 135,
+						height: 40,
+					}}
+					buttonTextStyle={{ fontSize: 16 }}
+				/>
+			</View> */}
 		</ScrollView>
 	);
 };
-const timeSettings2 = [4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 24];
 
 export default GoalScreen;
 
 const styles = StyleSheet.create({
+	// dropdownButton: {
+	// 	backgroundColor: "white",
+	// 	borderRadius: 10,
+	// },
+	// dropdownButtonDarkMode: {
+	// 	backgroundColor: "#5F5D8F",
+	// },
+	// dropdownButtonText: {
+	// 	fontSize: 16,
+	// },
+	// dropdownButtonTextDarkMode: {
+	// 	color: "white",
+	// },
 	screenBG: {
 		flex: 1,
 	},
@@ -610,15 +659,6 @@ const styles = StyleSheet.create({
 	helpTextDarkMode: {
 		color: "grey",
 	},
-	notificationButton: {
-		borderRadius: 10,
-		backgroundColor: "blue",
-	},
-	notificationButtonDarkMode: {},
-	notificationText: {
-		fontSize: 14,
-	},
-	notificationTextDarkMode: {},
 	cardShadow: {
 		shadowColor: "000",
 		shadowOffset: {

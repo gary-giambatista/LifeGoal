@@ -4,6 +4,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import GoalHelpModal from "../screens/GoalHelpModal";
 import GoalScreen from "../screens/GoalScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,7 @@ const C_SubStackNavigator = () => {
 			</Stack.Group>
 			<Stack.Group screenOptions={{ presentation: "modal" }}>
 				<Stack.Screen name="Goal Help Modal" component={GoalHelpModal} />
+				<Stack.Screen name="Profile" component={ProfileScreen} />
 			</Stack.Group>
 		</Stack.Navigator>
 	);
