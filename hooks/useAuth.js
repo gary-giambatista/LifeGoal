@@ -52,6 +52,9 @@ export const AuthContextProvider = ({ children }) => {
 
 	const logOut = async () => {
 		try {
+			// console.log(auth().currentUser);
+			// console.log(await auth().currentUser.getIdToken());
+			// await auth().currentUser.getIdToken(true);
 			await GoogleSignin.revokeAccess();
 			await auth().signOut();
 		} catch (error) {

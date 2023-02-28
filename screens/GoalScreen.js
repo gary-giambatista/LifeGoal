@@ -54,6 +54,7 @@ const GoalScreen = () => {
 	const [notification, setNotification] = useState(null); //check to see if notification exists
 	const [isLoading, setIsLoading] = useState(false);
 	const [notificationTimer, setNotificationTimer] = useState(6);
+	const [savingQuote, setSavingQuote] = useState(false);
 
 	console.log("Notification Timer", notificationTimer);
 
@@ -70,6 +71,8 @@ const GoalScreen = () => {
 				setGoal(data.data().goal);
 				setIsPublic(data.data().isPublic);
 				setNotificationTimer(data.data().timer);
+				setGoalCreatedDate(data.data().createdAt.seconds);
+				// console.log(data.data().createdAt);
 			}
 		}
 		fetchUserGoal();
@@ -162,6 +165,7 @@ const GoalScreen = () => {
 	}
 
 	async function saveQuote() {
+		setSavingQuote(true);
 		firestore()
 			.collection("Quotes")
 			// .doc(`${user.uid}`)
@@ -174,13 +178,11 @@ const GoalScreen = () => {
 			.then(() => {
 				//insert toast
 				ToastAndroid.show("Quote Saved successfully!", ToastAndroid.SHORT);
+				setTimeout(() => setSavingQuote(false), 1000);
 				console.log("Quote Saved!");
 			});
 	}
-	//Jonathan's consultation
-	//write in user created quotes
-	//Make user created quotes shareable
-	//add a screen for viewing user created quotes
+
 	async function clearNotifications() {
 		const notificationId =
 			await Notifications.getAllScheduledNotificationsAsync();
@@ -201,11 +203,6 @@ const GoalScreen = () => {
 			},
 			trigger: {
 				seconds: notificationTimer * 3600,
-				//notificationTimer * 3600
-				// repeats: true, 3600 x number of hours
-				// {2 hours: 7200, }
-				//.seconds / to get into days
-				//the current date - the unix time converted to days
 			},
 		});
 		console.log(
@@ -275,6 +272,36 @@ const GoalScreen = () => {
 				console.log("DB Timer updated!");
 			});
 	}
+
+	const [goalCreatedDate, setGoalCreatedDate] = useState(null);
+	console.log(goalCreatedDate);
+
+	//**TODO: Setting a goalCreatedDate in days */
+	//change goal setter function to include update function => alert
+	//"do you want to update your goal countdown timer?"
+	//yes => set(), no => update goal.goal text
+
+	// set a default state for goalCreatedDate
+	// get createdAt.seconds set as new goalCreatedDate
+	// use function in useEffect when goalCreatedDate changes to set a new state for the numberOfDaysLeft
+
+	//HOW TO HANDLE NO GOAL SET OR GOAL TIME ENDED
+	//^^ use conditionals to render messages
+
+	//TODO: Implement 30 day countdown since goal set time
+	//set goal day countdown timer
+	// useEffect(() => {
+	// 	async function calculateDaysLeft(seconds) {
+	// 		let miliseconds = seconds + 000;
+	// 		let now = Date.now();
+	// 		let timeLeft = now - miliseconds;
+	// 		if (timeLeft > 2592000000)
+	// 			//30 days of miliseconds Make goal 0
+	// 			console.log(`Use EFFECT RAN with ${seconds}`);
+	// 		//divide miliseconds - now / 86400 = days
+	// 	}
+	// 	calculateDaysLeft(goalCreatedDate);
+	// }, [goalCreatedDate]);
 
 	return (
 		<ScrollView
@@ -461,6 +488,7 @@ const GoalScreen = () => {
 								quote ? styles.quoteButtonSplit : null,
 								theme === "dark" ? styles.quoteButtonDarkMode : null,
 							]}
+							disabled={isFetching || savingQuote}
 						>
 							<Text style={styles.quoteButtonText}>Save Quote</Text>
 							<Ionicons
@@ -497,11 +525,11 @@ const GoalScreen = () => {
 					title=" Feeling down? View a Quote"
 				></Button> */}
 			</KeyboardAvoidingView>
-			<Button title="Check Notifications" onPress={clearNotifications}></Button>
+			{/* <Button title="Check Notifications" onPress={clearNotifications}></Button>
 			<Button
 				title="Schedule Notifications"
 				onPress={createNotification}
-			></Button>
+			></Button> */}
 			{/* <View
 				style={{
 					display: "flex",

@@ -8,6 +8,7 @@ import {
 	StyleSheet,
 	Text,
 	TextInput,
+	ToastAndroid,
 	TouchableOpacity,
 	TouchableWithoutFeedback,
 	View,
@@ -85,7 +86,15 @@ const PlanList = () => {
 						My Plans
 					</Text>
 					<AntDesign
-						onPress={() => setEditing(true)}
+						onPress={
+							plans.length > 20
+								? () =>
+										ToastAndroid.show(
+											"Sorry! Only 20 plans allowed!",
+											ToastAndroid.SHORT
+										)
+								: () => setEditing(true)
+						}
 						name="plus"
 						size={24}
 						color={theme === "dark" ? "#8A86CF" : "#222F42"}
@@ -176,7 +185,7 @@ const PlanList = () => {
 							onPress={() => {
 								createUserPlan();
 							}}
-							disabled={!editing || plan.length < 5}
+							disabled={!editing || plan.length < 5 || plans.length > 20}
 							style={styles.saveButton}
 						>
 							<Text style={styles.buttonText}>Save</Text>

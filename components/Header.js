@@ -6,7 +6,7 @@ import { useAuth } from "../hooks/useAuth";
 
 const Header = ({ title }) => {
 	const navigation = useNavigation();
-	const { theme, logOut } = useAuth();
+	const { theme, logOut, onGoogleButtonPress } = useAuth();
 
 	//alert for Logout Button pressed
 	const toggleLogoutAlert = () =>

@@ -83,17 +83,25 @@ const UserCreatedQuoteList = ({ editing, setEditing }) => {
 						value={userQuote}
 						editable={editing}
 					/>
+					{userQuote && userQuotes.length > 20 ? (
+						<Text style={{ paddingBottom: 5 }}>
+							Sorry! You can only write 20 quotes!
+						</Text>
+					) : null}
 					{userQuote && userQuote.length < 5 ? (
 						<Text style={{ paddingBottom: 5 }}>
 							Quote must be at least 5 characters
 						</Text>
 					) : null}
+
 					<View style={{ display: "flex", flexDirection: "row" }}>
 						<TouchableOpacity
 							onPress={() => {
 								createUserQuote();
 							}}
-							disabled={!editing || userQuote.length < 5}
+							disabled={
+								!editing || userQuote.length < 5 || userQuotes.length > 20
+							}
 							style={styles.saveButton}
 						>
 							<Text style={styles.buttonText}>Save</Text>
