@@ -273,35 +273,51 @@ const GoalScreen = () => {
 			});
 	}
 
-	const [goalCreatedDate, setGoalCreatedDate] = useState(null);
-	console.log(goalCreatedDate);
-
 	//**TODO: Setting a goalCreatedDate in days */
+	//HANDLING UPDATING USER GOAL WITHOUT CHANGING COUNTDOWN
 	//change goal setter function to include update function => alert
 	//"do you want to update your goal countdown timer?"
 	//yes => set(), no => update goal.goal text
+	//^^ add a userHasGoal state, set true after fetch with result.length > 0
 
 	// set a default state for goalCreatedDate
 	// get createdAt.seconds set as new goalCreatedDate
 	// use function in useEffect when goalCreatedDate changes to set a new state for the numberOfDaysLeft
 
+	//below being set by goal.createdAt date from fetch
+	const [goalCreatedDate, setGoalCreatedDate] = useState(null);
+	console.log(goalCreatedDate);
+
 	//HOW TO HANDLE NO GOAL SET OR GOAL TIME ENDED
-	//^^ use conditionals to render messages
+	//0. add a userHasGoal state, set true after fetch with result.length > 0
+	//1. use userHasGoal to conditionally render daysLeft
+	//2. if daysLeft = 0 render a message button to update(restart) goal
+	const [daysLeft, setDaysLeft] = useState(30);
 
 	//TODO: Implement 30 day countdown since goal set time
 	//set goal day countdown timer
-	// useEffect(() => {
-	// 	async function calculateDaysLeft(seconds) {
-	// 		let miliseconds = seconds + 000;
-	// 		let now = Date.now();
-	// 		let timeLeft = now - miliseconds;
-	// 		if (timeLeft > 2592000000)
-	// 			//30 days of miliseconds Make goal 0
-	// 			console.log(`Use EFFECT RAN with ${seconds}`);
-	// 		//divide miliseconds - now / 86400 = days
-	// 	}
-	// 	calculateDaysLeft(goalCreatedDate);
-	// }, [goalCreatedDate]);
+	useEffect(() => {
+		function calculateDaysLeft(seconds) {
+			console.log(`Use EFFECT RAN with ${seconds} seconds`);
+
+			let createdTimeinMiliseconds = seconds * 1000;
+			console.log(`Miliseconds ${createdTimeinMiliseconds}`);
+			let now = Date.now(); //miliseconds
+			console.log(`NOW ${now}`);
+			let timeLeft = now - createdTimeinMiliseconds;
+			console.log(`TimeLeft ${timeLeft}`);
+
+			//timeLeft is greater than 30 days in miliseconds
+			if (timeLeft > 2592000000) {
+				setDaysLeft(0);
+			} else {
+				//timeLeft less than 30 days
+				setDaysLeft(Math.floor((2592000000 - timeLeft) / 86400000)); // divide timeLeft / miliseconds in a day
+			}
+		}
+		return () => calculateDaysLeft(goalCreatedDate);
+	}, [goalCreatedDate]);
+	//TODO: Search how to properly cleanup a useEffect
 
 	return (
 		<ScrollView
@@ -367,6 +383,23 @@ const GoalScreen = () => {
 					style={{ paddingLeft: 5 }}
 				/>
 			</TouchableOpacity>
+			<View
+				style={{
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+				}}
+			>
+				<Text
+					style={{
+						fontSize: 20,
+						fontFamily: "PhiloBold",
+						textAlign: "center",
+					}}
+				>
+					{daysLeft} days left
+				</Text>
+			</View>
 			{/* <View style={[styles.CtaContainer, styles.cardShadow]}>
 				<Text style={styles.callToAction}>
 					Plant this Goal in your mind,{"\n"} and water it with attention
