@@ -45,6 +45,7 @@ const GoalScreen = () => {
 	const { logOut, user, theme } = useAuth();
 	//state
 	const [goal, setGoal] = useState("");
+	const [goalCopy, setGoalCopy] = useState("");
 	const [editing, setEditing] = useState(false);
 	const inputRef = useRef();
 	const [isPublic, setIsPublic] = useState(false);
@@ -69,6 +70,7 @@ const GoalScreen = () => {
 			// console.log("user data: ", data.data().goal);
 			if (data.data().goal) {
 				setGoal(data.data().goal);
+				setGoalCopy(data.data().goal);
 				setIsPublic(data.data().isPublic);
 				setNotificationTimer(data.data().timer);
 				setGoalCreatedDate(data.data().createdAt.seconds);
@@ -92,7 +94,7 @@ const GoalScreen = () => {
 	}
 	//Update or add a goal function
 	async function saveGoal() {
-		//db call to update goal
+		//db call to create new goal
 		firestore()
 			.collection("Goals")
 			.doc(`${user.uid}`)
@@ -106,10 +108,37 @@ const GoalScreen = () => {
 			})
 			.then(() => {
 				console.log("Goal Updated!");
+				setEditing(false);
 			});
-		setEditing(false);
+	}
+	//Update goal without replacing created at time
+	async function updateGoal() {
+		//db call to update existing goal
+		firestore()
+			.collection("Goals")
+			.doc(`${user.uid}`)
+			.update({
+				goal: goal,
+			})
+			.then(() => {
+				console.log("ONLY Goal Updated!");
+				setEditing(false);
+			});
 	}
 
+	//alert for choosing how to update goal timer
+	const checkToUpdateTimer = () =>
+		Alert.alert(
+			"Restart Goal Timer?",
+			"If you select Yes, the timer will start from 30 days again.",
+			[
+				{
+					text: "No",
+					onPress: () => updateGoal(),
+				},
+				{ text: "Yes", onPress: () => saveGoal() },
+			]
+		);
 	//alert for setting goal to public
 	const togglePublicOnAlert = () =>
 		Alert.alert("Are you sure?", "Why share? Help give others inspiration!", [
@@ -304,7 +333,8 @@ const GoalScreen = () => {
 			console.log(`Miliseconds ${createdTimeinMiliseconds}`);
 			let now = Date.now(); //miliseconds
 			console.log(`NOW ${now}`);
-			let timeLeft = now - createdTimeinMiliseconds;
+			// prettier-ignore
+			let timeLeft = (now - createdTimeinMiliseconds);
 			console.log(`TimeLeft ${timeLeft}`);
 
 			//timeLeft is greater than 30 days in miliseconds
@@ -383,23 +413,46 @@ const GoalScreen = () => {
 					style={{ paddingLeft: 5 }}
 				/>
 			</TouchableOpacity>
-			<View
-				style={{
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
-				<Text
+			{/* Double Ternary: Show goal timer if there is a goal and daysLeft is not 0, otherwise if timeLeft is 0, show message to update goal */}
+			{goal && daysLeft !== 0 ? (
+				<View
 					style={{
-						fontSize: 20,
-						fontFamily: "PhiloBold",
-						textAlign: "center",
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
 					}}
 				>
-					{daysLeft} days left
-				</Text>
-			</View>
+					<Text
+						style={{
+							fontSize: 20,
+							fontFamily: "PhiloBold",
+							textAlign: "center",
+							color: theme === "dark" ? "white" : null,
+						}}
+					>
+						{daysLeft} days left
+					</Text>
+				</View>
+			) : daysLeft === 0 ? (
+				<View
+					style={{
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+					}}
+				>
+					<Text
+						style={{
+							fontSize: 20,
+							fontFamily: "PhiloBold",
+							textAlign: "center",
+							color: theme === "dark" ? "white" : null,
+						}}
+					>
+						Times up! {"\n"} Update your goal to start again!
+					</Text>
+				</View>
+			) : null}
 			{/* <View style={[styles.CtaContainer, styles.cardShadow]}>
 				<Text style={styles.callToAction}>
 					Plant this Goal in your mind,{"\n"} and water it with attention
@@ -423,9 +476,8 @@ const GoalScreen = () => {
 							/>
 						) : (
 							<Text style={styles.placeholderText}>
-								Describe your goal here, your dream, the ideal world you are
-								striving to create and live in. It is something that you can
-								always strive for, no matter where you are in your life...
+								Describe the one goal that you can accomplish in the next 30
+								days, which will have the biggest positive impact on your life!
 							</Text>
 						)}
 					</View>
@@ -465,36 +517,60 @@ const GoalScreen = () => {
 							theme === "dark" ? styles.darkButton : null,
 							editing && theme === "dark" ? styles.editingDarkMode : null,
 						]}
-						onPress={editing ? saveGoal : editGoal}
+						onPress={
+							editing ? (goal ? checkToUpdateTimer : saveGoal) : editGoal
+						}
 					>
 						<Text style={styles.editButtonText}>
 							{editing ? "Save Goal" : "Edit Goal"}{" "}
 						</Text>
 					</TouchableOpacity>
-					<Text
-						style={[
-							styles.switchText,
-							theme === "dark" ? styles.switchTextDarkMode : null,
-						]}
-					>
-						Share your goal anonymously...{" "}
-					</Text>
-					{/* changes Which switch is shown. isPublic state issue required 2 Switches instead of a conditional for onValueChange/Value */}
-					{isPublic ? (
-						<Switch
-							disabled={editing}
-							style={styles.switchSwitch}
-							value={isPublic}
-							onValueChange={togglePublicOffAlert}
-						/>
-					) : (
-						<Switch
-							disabled={editing}
-							style={styles.switchSwitch}
-							value={isPublic}
-							onValueChange={togglePublicOnAlert}
-						/>
-					)}
+					{/* ONLY SHOW: CANCEL BUTTON when editing */}
+					{editing ? (
+						<TouchableOpacity
+							style={[
+								styles.cancelButton,
+								theme === "dark" ? styles.cancelButtonDarkMode : null,
+							]}
+							onPress={() => {
+								setGoal(goalCopy);
+								setEditing(false);
+							}}
+						>
+							<Text style={styles.editButtonText}>Cancel</Text>
+						</TouchableOpacity>
+					) : null}
+					{/* ONLY SHOW: Public switch when not editing */}
+					{!editing ? (
+						<Text
+							style={[
+								styles.switchText,
+								theme === "dark" ? styles.switchTextDarkMode : null,
+							]}
+						>
+							Share your goal anonymously...{" "}
+						</Text>
+					) : null}
+					{/* NESTED TERNARY: 
+					ONLY SHOW: Public switch when not editing &&
+					changes Which switch is shown. isPublic state issue required 2 Switches instead of a conditional for onValueChange/Value */}
+					{!editing ? (
+						isPublic ? (
+							<Switch
+								disabled={editing}
+								style={styles.switchSwitch}
+								value={isPublic}
+								onValueChange={togglePublicOffAlert}
+							/>
+						) : (
+							<Switch
+								disabled={editing}
+								style={styles.switchSwitch}
+								value={isPublic}
+								onValueChange={togglePublicOnAlert}
+							/>
+						)
+					) : null}
 				</View>
 				{/* Quote section */}
 				{isFetching ? <ActivityIndicator /> : null}
@@ -840,7 +916,6 @@ const styles = StyleSheet.create({
 		height: 35,
 		width: 100,
 		backgroundColor: "#222F42",
-
 		borderRadius: 6,
 		// marginRight: 10,
 	},
@@ -859,6 +934,20 @@ const styles = StyleSheet.create({
 		// letterSpacing: 1,
 		color: "white",
 	},
+	cancelButton: {
+		display: "flex",
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+		backgroundColor: "black",
+		height: 35,
+		width: 100,
+		backgroundColor: "#993626",
+		borderRadius: 6,
+		marginRight: "auto",
+		marginLeft: 10,
+	},
+	cancelButtonDarkMode: {},
 	switchText: {
 		fontSize: 14,
 	},
