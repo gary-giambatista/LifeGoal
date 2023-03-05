@@ -59,6 +59,20 @@ const GoalScreen = () => {
 
 	console.log("Notification Timer", notificationTimer);
 
+	//fetch user's Goal function
+	async function fetchUserGoal() {
+		const data = await firestore().collection("Goals").doc(`${user.uid}`).get();
+		// console.log("user data: ", data.data().goal);
+		if (data.data().goal) {
+			setGoal(data.data().goal);
+			setGoalCopy(data.data().goal);
+			setIsPublic(data.data().isPublic);
+			setNotificationTimer(data.data().timer);
+			setGoalCreatedDate(data.data().createdAt.seconds);
+			// console.log(data.data().createdAt);
+		}
+	}
+
 	//GET: fetch user's goal data from Firebase
 	useEffect(() => {
 		setIsLoading(true);
@@ -122,6 +136,7 @@ const GoalScreen = () => {
 			})
 			.then(() => {
 				console.log("ONLY Goal Updated!");
+				fetchUserGoal();
 				setEditing(false);
 			});
 	}
@@ -278,10 +293,10 @@ const GoalScreen = () => {
 	//2. clear that notification
 	//3. then create new notification createNotification(seconds)
 	async function updateNotification(notificationTimer) {
-		console.log("Update Notification CALLED");
+		// console.log("Update Notification CALLED");
 		try {
 			Notifications.cancelAllScheduledNotificationsAsync();
-			console.log("Notifications CANCELLED");
+			// console.log("Notifications CANCELLED");
 			await createNotification(notificationTimer);
 			//update goal notification timer here
 			await updateNotificationTimer(notificationTimer);
@@ -326,28 +341,37 @@ const GoalScreen = () => {
 	//TODO: Implement 30 day countdown since goal set time
 	//set goal day countdown timer
 	useEffect(() => {
-		function calculateDaysLeft(seconds) {
+		const calculateDaysLeft = async (seconds) => {
 			console.log(`Use EFFECT RAN with ${seconds} seconds`);
 
 			let createdTimeinMiliseconds = seconds * 1000;
-			console.log(`Miliseconds ${createdTimeinMiliseconds}`);
-			let now = Date.now(); //miliseconds
-			console.log(`NOW ${now}`);
-			// prettier-ignore
-			let timeLeft = (now - createdTimeinMiliseconds);
-			console.log(`TimeLeft ${timeLeft}`);
-
-			//timeLeft is greater than 30 days in miliseconds
-			if (timeLeft > 2592000000) {
-				setDaysLeft(0);
-			} else {
-				//timeLeft less than 30 days
-				setDaysLeft(Math.floor((2592000000 - timeLeft) / 86400000)); // divide timeLeft / miliseconds in a day
-			}
-		}
-		return () => calculateDaysLeft(goalCreatedDate);
+			// console.log(`Miliseconds ${createdTimeinMiliseconds}`);
+			// let now = Date.now(); //miliseconds
+			// console.log(`NOW ${now}`);
+			// // prettier-ignore
+			// let timeLeft = (now - createdTimeinMiliseconds);
+			// console.log(`TimeLeft ${timeLeft}`);
+			const timeLeft = await calculateTimeLeft(createdTimeinMiliseconds);
+			const setDays = await setDaysLeftFunction(timeLeft);
+			return setDays;
+		};
+		return async () => await calculateDaysLeft(goalCreatedDate);
 	}, [goalCreatedDate]);
 	//TODO: Search how to properly cleanup a useEffect
+
+	async function calculateTimeLeft(createdTimeinMiliseconds) {
+		let now = Date.now(); //miliseconds
+		let timeLeft = now - createdTimeinMiliseconds;
+		return timeLeft;
+	}
+	async function setDaysLeftFunction(timeLeft) {
+		if (timeLeft > 2592000000) {
+			setDaysLeft(0);
+		} else {
+			//timeLeft less than 30 days
+			setDaysLeft(Math.floor((2592000000 - timeLeft) / 86400000)); // divide timeLeft / miliseconds in a day
+		}
+	}
 
 	return (
 		<ScrollView
